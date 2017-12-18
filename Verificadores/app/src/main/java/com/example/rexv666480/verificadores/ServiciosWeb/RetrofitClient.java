@@ -31,7 +31,7 @@ public class RetrofitClient {
     }
 
     private Retrofit retrofit;
-    public static final String BASE_URL = "http://bluecloud.com.mx/verificadores/";//8023
+    public static final String BASE_URL = "http://bluecloud.com.mx/verificadores/Servicios/";//8023
 
     public RetrofitClient() {
         gson = new GsonBuilder()

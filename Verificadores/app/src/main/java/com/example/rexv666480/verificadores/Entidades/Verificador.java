@@ -14,12 +14,21 @@ public class Verificador {
     private int id;
     private String token;
     private String nombre;
+    private int IdVisita;
 
     public Verificador(Ubicacion ubicacion, int id, String token, String nombre) {
         this.ubicacion = ubicacion;
         this.id = id;
         this.token = token;
         this.nombre = nombre;
+    }
+
+    public int getIdVisita() {
+        return IdVisita;
+    }
+
+    public void setIdVisita(int idVisita) {
+        IdVisita = idVisita;
     }
 
     public Verificador() {

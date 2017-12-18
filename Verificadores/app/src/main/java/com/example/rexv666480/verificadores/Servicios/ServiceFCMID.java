@@ -26,12 +26,12 @@ public class ServiceFCMID extends FirebaseInstanceIdService {
         storeRegIdInPref(refreshedToken);
 
         // sending reg id to your server
-        sendRegistrationToServer(refreshedToken);
+        //sendRegistrationToServer(refreshedToken);
 
         // Notify UI that registration has completed, so the progress indicator can be hidden.
-        Intent registrationComplete = new Intent();
+        /*Intent registrationComplete = new Intent();
         registrationComplete.putExtra("token", refreshedToken);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);*/
     }
 
     private void sendRegistrationToServer(final String token) {
@@ -40,9 +40,9 @@ public class ServiceFCMID extends FirebaseInstanceIdService {
     }
 
     private void storeRegIdInPref(String token) {
-        SharedPreferences pref = getApplicationContext().getSharedPreferences("token", 0);
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MisPreferencias", getApplicationContext().MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putString("regId", token);
+        editor.putString("token", token);
         editor.commit();
     }
 }

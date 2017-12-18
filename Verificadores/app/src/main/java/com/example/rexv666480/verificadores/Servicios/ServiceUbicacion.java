@@ -51,6 +51,7 @@ public class ServiceUbicacion extends Service
             Verificador verificador = new Verificador();
             LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
             verificador.setId(1);
+            verificador.setIdVisita(1);
             verificador.setNombre("Victor Adrian Reyes");
             verificador.setToken("T12345678w");
             verificador.setUbicacion(new Ubicacion(latLng , "Ubicacion Actual del Operador"));

@@ -17,6 +17,6 @@ import retrofit2.http.Query;
 
 public interface ServiciosWeb {
     //@FormUrlEncoded
-    @POST("Ubicacion")
+    @POST("InsertarRuta")
     Call<Respuesta> enviarUbicacionActual(@Body Verificador verfficador);
 }
