@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Verificadores</string>
+    <string name="usuario">Usuario</string>
+    <string name="contra">Contraseña</string>
+    <string name="iniciar">Iniciar Sesión</string>
+
 </resources>

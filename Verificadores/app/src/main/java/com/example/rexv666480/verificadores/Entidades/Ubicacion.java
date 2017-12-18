@@ -15,6 +15,8 @@ public class Ubicacion
         Direccion = direccion;
     }
 
+    public Ubicacion() {
+    }
 
     public LatLng getLatLng() {
         return latLng;

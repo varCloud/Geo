@@ -24,6 +24,9 @@
             android:value="@integer/google_play_services_version" />
 
         <activity android:name=".RutasActivity">
+
+        </activity>
+        <activity android:name=".IniciarSesionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -43,7 +46,7 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".IniciarSesionActivity"></activity>
+
     </application>
 
 </manifest>
