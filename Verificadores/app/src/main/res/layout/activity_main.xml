@@ -17,26 +17,27 @@
 
 <LinearLayout
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:id="@+id/linearLayout"
+    android:layout_alignParentTop="true"
+    android:layout_alignParentStart="true">
 
 
     <Button
         android:id="@+id/btnIniciarNevegacion"
-        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:text="Iniciar Ruta"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:background="@color/colorPrimaryDark"
-        android:textColor="@color/cast_expanded_controller_progress_text_color" />
+        android:layout_height="wrap_content"
+        android:text="iniciar"
+        android:textColor="@color/colorBlanco"
+        android:theme="@style/Botones" />
 
     <Button
         android:id="@+id/btnPausarRuta"
-        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Pausar Ruta"
         android:background="@color/colorPrimaryDark"
-        android:textColor="@color/cast_expanded_controller_progress_text_color"
+        android:textColor="@color/colorBlanco"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         />
@@ -47,14 +48,17 @@
         android:layout_width="wrap_content"
         android:text="Cancelar Ruta"
         android:background="@color/colorPrimaryDark"
-        android:textColor="@color/cast_expanded_controller_progress_text_color"
+        android:textColor="@color/colorBlanco"
+        android:theme="@style/Botones"
         />
+
+
 
 </LinearLayout>
 
 
 
-        <!--<Button-->
+    <!--<Button-->
             <!--android:id="@+id/btnCancelarNevegacion"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:layout_width="wrap_content"-->

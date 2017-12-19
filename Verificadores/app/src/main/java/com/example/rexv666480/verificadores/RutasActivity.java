@@ -1,5 +1,6 @@
 package com.example.rexv666480.verificadores;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
@@ -16,8 +17,12 @@ import android.widget.ListView;
 import com.example.rexv666480.verificadores.Adapters.AdapterRuta;
 import com.example.rexv666480.verificadores.Adapters.AdapterRutas;
 import com.example.rexv666480.verificadores.Entidades.Ruta;
+import com.example.rexv666480.verificadores.Entidades.Ubicacion;
+import com.example.rexv666480.verificadores.Entidades.Verificador;
 import com.example.rexv666480.verificadores.Servicios.ServiceUbicacion;
 
+import com.example.rexv666480.verificadores.Utilerias.UbicacionActual;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
@@ -28,6 +33,8 @@ public class RutasActivity extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ListView mListView;
+    private Verificador verificador;
+    Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +42,7 @@ public class RutasActivity extends AppCompatActivity {
         try {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_rutas);
-
+            activity = this;
             mRecyclerView = (RecyclerView) findViewById(R.id.ListRutasActuales);
             // use this setting to improve performance if you know that changes
             // in content do not change the layout size of the RecyclerView
@@ -49,10 +56,10 @@ public class RutasActivity extends AppCompatActivity {
             Ruta r = new Ruta();
             r.initializeData();
 
+            Intent i = getIntent();
+            verificador = new Gson().fromJson(i.getStringExtra("paramVerificador"),Verificador.class);
             mAdapter = new AdapterRutas(r.rutas);
-
             mRecyclerView.setAdapter(mAdapter);
-
             mListView = (ListView) findViewById(R.id.lvRutasActuales);
             AdapterRuta adapterRuta = new AdapterRuta(this,r.rutas);
             mListView.setAdapter(adapterRuta);
@@ -94,8 +101,8 @@ public class RutasActivity extends AppCompatActivity {
             }
         }else
         {
-            Intent intent = new Intent(this, ServiceUbicacion.class);
-            startService(intent);
+            //Intent intent = new Intent(this, ServiceUbicacion.class);
+            //startService(intent);
         }
     }
 
@@ -105,11 +112,16 @@ public class RutasActivity extends AppCompatActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
                 Intent intentMapa = new Intent(RutasActivity.this, MainActivity.class);
-                String message = "abc";
+                UbicacionActual ubicacionActual = new UbicacionActual();
+                ubicacionActual.getLocation(activity);
                 Ruta ruta = (Ruta) parent.getItemAtPosition(position);
+                ruta.getOrigen().setLatLng(new LatLng(ubicacionActual.getLatitude(),ubicacionActual.getLongitude()));
                 intentMapa.putExtra("paramRuta",  new Gson().toJson(ruta));
+                intentMapa.putExtra("paramVerificador",  new Gson().toJson(verificador));
                 startActivity(intentMapa);
+
             }
         });
     }
@@ -122,8 +134,8 @@ public class RutasActivity extends AppCompatActivity {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        Intent intent = new Intent(this, ServiceUbicacion.class);
-                        startService(intent);
+                        //Intent intent = new Intent(this, ServiceUbicacion.class);
+                        //startService(intent);
                 } else {
 
                 }

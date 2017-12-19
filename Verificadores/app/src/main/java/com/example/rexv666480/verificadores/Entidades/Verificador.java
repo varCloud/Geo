@@ -8,13 +8,13 @@ import com.google.gson.annotations.SerializedName;
 
 public class Verificador {
 
-    @SerializedName("ubicacion")
+    @SerializedName("Ubicacion")
     private Ubicacion ubicacion;
 
-    private int id;
+    private int idVerificador;
     private String token;
     private String nombre;
-    private int IdVisita;
+    private int idRuta;
     private String contrasena;
     private String usuario;
 
@@ -23,14 +23,14 @@ public class Verificador {
     }
 
     public Verificador(int id, String token, String nombre) {
-        this.id = id;
+        this.idVerificador = id;
         this.token = token;
         this.nombre = nombre;
     }
 
     public Verificador(Ubicacion ubicacion, int id, String token, String nombre) {
         this.ubicacion = ubicacion;
-        this.id = id;
+        this.idVerificador = id;
         this.token = token;
         this.nombre = nombre;
     }
@@ -51,12 +51,12 @@ public class Verificador {
         this.usuario = usuario;
     }
 
-    public int getIdVisita() {
-        return IdVisita;
+    public int getidRuta() {
+        return idRuta;
     }
 
-    public void setIdVisita(int idVisita) {
-        IdVisita = idVisita;
+    public void setidRuta(int idVisita) {
+        this.idRuta = idVisita;
     }
 
 
@@ -69,11 +69,11 @@ public class Verificador {
     }
 
     public int getId() {
-        return id;
+        return idVerificador;
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.idVerificador = id;
     }
 
     public String getToken() {

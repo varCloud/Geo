@@ -14,17 +14,17 @@ import java.util.List;
 
 public class Ruta   {
 
-    private int id;
+    private int idRuta;
     private Ubicacion origen;
     private Ubicacion destino;
     private String descripcionRuta;
 
     public int getId() {
-        return id;
+        return idRuta;
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.idRuta = id;
     }
 
     public Ubicacion getOrigen() {
@@ -52,7 +52,7 @@ public class Ruta   {
     }
 
     public Ruta(int id, Ubicacion origen, Ubicacion destino, String descripcionRuta) {
-        this.id = id;
+        this.idRuta = id;
         this.origen = origen;
         this.destino = destino;
         this.descripcionRuta = descripcionRuta;
