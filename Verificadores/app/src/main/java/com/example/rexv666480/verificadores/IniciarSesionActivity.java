@@ -3,7 +3,6 @@ package com.example.rexv666480.verificadores;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,8 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.rexv666480.verificadores.Entidades.Respuesta;
-import com.example.rexv666480.verificadores.Entidades.Ruta;
 import com.example.rexv666480.verificadores.Entidades.Verificador;
 import com.example.rexv666480.verificadores.ServiciosWeb.RetrofitClient;
 import com.example.rexv666480.verificadores.ServiciosWeb.ServiciosWeb;
@@ -60,7 +57,7 @@ public class IniciarSesionActivity extends AppCompatActivity {
                         if(response.code() == 200)
                         {
                             try {
-                                    Intent intentRutas = new Intent(IniciarSesionActivity.this, RutasActivity.class);
+                                    Intent intentRutas = new Intent(IniciarSesionActivity.this, VisitasActivity.class);
                                     verificador.setId(1);
                                     intentRutas.putExtra("paramVerificador", new Gson().toJson(verificador));
                                     startActivity(intentRutas);

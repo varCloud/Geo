@@ -1,6 +1,7 @@
 package com.example.rexv666480.verificadores;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
@@ -16,60 +17,95 @@ import android.widget.ListView;
 
 import com.example.rexv666480.verificadores.Adapters.AdapterRuta;
 import com.example.rexv666480.verificadores.Adapters.AdapterRutas;
+import com.example.rexv666480.verificadores.Adapters.AdapterVisitas;
 import com.example.rexv666480.verificadores.Entidades.Ruta;
-import com.example.rexv666480.verificadores.Entidades.Ubicacion;
 import com.example.rexv666480.verificadores.Entidades.Verificador;
-import com.example.rexv666480.verificadores.Servicios.ServiceUbicacion;
 
+import com.example.rexv666480.verificadores.Entidades.Visita;
+import com.example.rexv666480.verificadores.ServiciosWeb.Respuestas.RespVisitas;
+import com.example.rexv666480.verificadores.ServiciosWeb.RetrofitClient;
+import com.example.rexv666480.verificadores.ServiciosWeb.ServiciosWeb;
+import com.example.rexv666480.verificadores.Utilerias.Loading;
 import com.example.rexv666480.verificadores.Utilerias.UbicacionActual;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 
-public class RutasActivity extends AppCompatActivity {
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class VisitasActivity extends AppCompatActivity {
     private static final int ACCESS_FINE_LOCATION = 102;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ListView mListView;
     private Verificador verificador;
+    Loading loading =null;
+    Context context = null;
+
     Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         try {
             super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_rutas);
+            setContentView(R.layout.activity_visitas);
             activity = this;
-            mRecyclerView = (RecyclerView) findViewById(R.id.ListRutasActuales);
-            // use this setting to improve performance if you know that changes
-            // in content do not change the layout size of the RecyclerView
-            mRecyclerView.setHasFixedSize(true);
-            //mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-            // use a linear layout manager
-            mLayoutManager = new LinearLayoutManager(this);
-            mRecyclerView.setLayoutManager(mLayoutManager);
-
-            // specify an adapter (see also next example)
-            Ruta r = new Ruta();
-            r.initializeData();
-
+            context = this;
+            //obtenemos los parametros que se pasaron de la actividad
             Intent i = getIntent();
             verificador = new Gson().fromJson(i.getStringExtra("paramVerificador"),Verificador.class);
-            mAdapter = new AdapterRutas(r.rutas);
-            mRecyclerView.setAdapter(mAdapter);
-            mListView = (ListView) findViewById(R.id.lvRutasActuales);
-            AdapterRuta adapterRuta = new AdapterRuta(this,r.rutas);
-            mListView.setAdapter(adapterRuta);
-            InitClickListView();
             PermisoUbicacion();
-            Log.d("TOKEN",FirebaseInstanceId.getInstance().getToken());
+            loading = new Loading(context);
+            ObtenerVisitas();
+            //Log.d("TOKEN",FirebaseInstanceId.getInstance().getToken());
 
 
         } catch (Exception ex) {
             Log.d("Mensaje Verificadores", ex.getMessage());
+        }
+    }
+    public  void ObtenerVisitas()
+    {
+        try
+        {
+            loading.ShowLoading("Descargando visitas pendientes");
+            RetrofitClient retrofitClient  = new RetrofitClient();
+            ServiciosWeb sw =  retrofitClient.getRetrofit().create(ServiciosWeb.class);
+            verificador.setId(1);
+            sw.obtenerVisitas(verificador).enqueue(new Callback<RespVisitas>() {
+                @Override
+                public void onResponse(Call<RespVisitas> call, Response<RespVisitas> response) {
+                    if(response.code() == 200)
+                    {
+                        RespVisitas r = response.body();
+                        if(r.getEstatus().toString().equals("200"))
+                        {
+                            mListView = (ListView) findViewById(R.id.lvRutasActuales);
+                            AdapterVisitas adapterVisita =  new AdapterVisitas(getApplicationContext(), r.getVisitas());
+                            mListView.setAdapter(adapterVisita);
+                            InitClickListView();
+                        }
+                    }else{
+
+                    }
+                    loading.CerrarLoading();
+
+                }
+
+                @Override
+                public void onFailure(Call<RespVisitas> call, Throwable t) {
+
+                }
+            });
+
+        }catch (Exception ex)
+        {
+            throw  ex;
         }
     }
 
@@ -113,12 +149,12 @@ public class RutasActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Intent intentMapa = new Intent(RutasActivity.this, MainActivity.class);
+                Intent intentMapa = new Intent(VisitasActivity.this, MainActivity.class);
                 UbicacionActual ubicacionActual = new UbicacionActual();
                 ubicacionActual.getLocation(activity);
-                Ruta ruta = (Ruta) parent.getItemAtPosition(position);
-                ruta.getOrigen().setLatLng(new LatLng(ubicacionActual.getLatitude(),ubicacionActual.getLongitude()));
-                intentMapa.putExtra("paramRuta",  new Gson().toJson(ruta));
+                Visita visita = (Visita) parent.getItemAtPosition(position);
+                //visita.getOrigen().setLatLng(new LatLng(ubicacionActual.getLatitude(),ubicacionActual.getLongitude()));
+                intentMapa.putExtra("paramVisita",  new Gson().toJson(visita));
                 intentMapa.putExtra("paramVerificador",  new Gson().toJson(verificador));
                 startActivity(intentMapa);
 

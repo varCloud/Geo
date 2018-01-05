@@ -2,8 +2,12 @@ package com.example.rexv666480.verificadores.ServiciosWeb;
 
 import com.example.rexv666480.verificadores.Entidades.Respuesta;
 import com.example.rexv666480.verificadores.Entidades.Verificador;
+import com.example.rexv666480.verificadores.Entidades.Visita;
 import com.example.rexv666480.verificadores.ServiciosWeb.Respuestas.RespEstatus;
+import com.example.rexv666480.verificadores.ServiciosWeb.Respuestas.RespVisitas;
 import com.google.android.gms.safetynet.SafetyNetApi;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -21,6 +25,9 @@ public interface ServiciosWeb {
     //@FormUrlEncoded
     @POST("InsertarRuta")
     Call<RespEstatus> enviarUbicacionActual(@Body Verificador verfficador);
+
+    @POST("ObtenerVisitas")
+    Call<RespVisitas> obtenerVisitas(@Body Verificador verificador);
 
     @POST("ValidaUsuario")
     Call<Verificador> ValidaUsuario(@Body Verificador verfficador);
