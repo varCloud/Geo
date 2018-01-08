@@ -4,6 +4,7 @@ import com.example.rexv666480.verificadores.Entidades.Respuesta;
 import com.example.rexv666480.verificadores.Entidades.Verificador;
 import com.example.rexv666480.verificadores.Entidades.Visita;
 import com.example.rexv666480.verificadores.ServiciosWeb.Respuestas.RespEstatus;
+import com.example.rexv666480.verificadores.ServiciosWeb.Respuestas.RespSesion;
 import com.example.rexv666480.verificadores.ServiciosWeb.Respuestas.RespVisitas;
 import com.google.android.gms.safetynet.SafetyNetApi;
 
@@ -30,5 +31,5 @@ public interface ServiciosWeb {
     Call<RespVisitas> obtenerVisitas(@Body Verificador verificador);
 
     @POST("ValidaUsuario")
-    Call<Verificador> ValidaUsuario(@Body Verificador verfficador);
+    Call<RespSesion> ValidaUsuario(@Body Verificador verfficador);
 }

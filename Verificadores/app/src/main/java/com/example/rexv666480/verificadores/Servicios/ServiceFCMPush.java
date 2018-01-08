@@ -22,7 +22,7 @@ import org.json.JSONObject;
 
 public class ServiceFCMPush extends FirebaseMessagingService {
 
-    private static final String TAG = ServiceFCMPush.class.getSimpleName();
+    private static final String TAG = "notificaciones push";
 
     private NotificationUtils notificationUtils;
 
@@ -41,8 +41,6 @@ public class ServiceFCMPush extends FirebaseMessagingService {
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
-            Log.e(TAG, "Data Payload: " + remoteMessage.getData().toString());
-
             try {
                 JSONObject json = new JSONObject(remoteMessage.getData().toString());
                 handleDataMessage(json);
@@ -54,6 +52,7 @@ public class ServiceFCMPush extends FirebaseMessagingService {
 
     private void handleNotification(String message) {
         if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
+            Log.e(TAG, "Notification Body: " + "Esta Primer Plano ");
             // app is in foreground, broadcast the push message
             Intent pushNotification = new Intent("pushNotification");
             pushNotification.putExtra("message", message);
@@ -63,7 +62,7 @@ public class ServiceFCMPush extends FirebaseMessagingService {
             NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
             notificationUtils.playNotificationSound();
         }else{
-            // If the app is in background, firebase itself handles the notification
+            Log.e(TAG, "Notification Body: " + "Esta en segungo plano ");
         }
     }
 
@@ -71,44 +70,37 @@ public class ServiceFCMPush extends FirebaseMessagingService {
         Log.e(TAG, "push json: " + json.toString());
 
         try {
-            JSONObject data = json.getJSONObject("data");
+            //JSONObject data = json.getJSONObject("data");
 
-            String title = data.getString("title");
-            String message = data.getString("message");
-            boolean isBackground = data.getBoolean("is_background");
-            String imageUrl = data.getString("image");
-            String timestamp = data.getString("timestamp");
-            JSONObject payload = data.getJSONObject("payload");
-
+            String title = json.getString("titulo");
+                String message = json.getString("mensaje");
+            String tipoNotificacion  = json.getString("tipoNotificacion");
             Log.e(TAG, "title: " + title);
             Log.e(TAG, "message: " + message);
-            Log.e(TAG, "isBackground: " + isBackground);
-            Log.e(TAG, "payload: " + payload.toString());
-            Log.e(TAG, "imageUrl: " + imageUrl);
-            Log.e(TAG, "timestamp: " + timestamp);
-
+            Log.e(TAG, "tipoNotificacion: " + tipoNotificacion);
 
             if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
-                // app is in foreground, broadcast the push message
-                Intent pushNotification = new Intent("pushNotification");
-                pushNotification.putExtra("message", message);
+                Log.e(TAG, "Notification Body: " + "Esta Primer Plano ");
+                Intent pushNotification = new Intent("OtraNotifiacion");
+                pushNotification.putExtra("message", tipoNotificacion);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
 
                 // play notification sound
                 NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
                 notificationUtils.playNotificationSound();
             } else {
+                Log.e(TAG, "Notification Body: " + "Esta en Segungo Plano");
                 // app is in background, show the notification in notification tray
                 Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
-                resultIntent.putExtra("message", message);
-
-                // check for image attachment
+                resultIntent.putExtra("message", tipoNotificacion);
+                showNotificationMessage(getApplicationContext(), title, message, resultIntent);
+                /*
                 if (TextUtils.isEmpty(imageUrl)) {
                     showNotificationMessage(getApplicationContext(), title, message, timestamp, resultIntent);
                 } else {
                     // image is present, show notification with image
                     showNotificationMessageWithBigImage(getApplicationContext(), title, message, timestamp, resultIntent, imageUrl);
-                }
+                }*/
             }
         } catch (JSONException e) {
             Log.e(TAG, "Json Exception: " + e.getMessage());
@@ -120,10 +112,10 @@ public class ServiceFCMPush extends FirebaseMessagingService {
     /**
      * Showing notification with text only
      */
-    private void showNotificationMessage(Context context, String title, String message, String timeStamp, Intent intent) {
+    private void showNotificationMessage(Context context, String title, String message,  Intent intent) {
         notificationUtils = new NotificationUtils(context);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        notificationUtils.showNotificationMessage(title, message, timeStamp, intent);
+        notificationUtils.showNotificationMessage(title, message,  intent);
     }
 
     /**
@@ -132,6 +124,6 @@ public class ServiceFCMPush extends FirebaseMessagingService {
     private void showNotificationMessageWithBigImage(Context context, String title, String message, String timeStamp, Intent intent, String imageUrl) {
         notificationUtils = new NotificationUtils(context);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        notificationUtils.showNotificationMessage(title, message, timeStamp, intent, imageUrl);
+        notificationUtils.showNotificationMessage(title, message, intent, imageUrl);
     }
 }

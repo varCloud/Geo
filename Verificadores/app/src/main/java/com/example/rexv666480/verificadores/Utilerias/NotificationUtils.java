@@ -46,11 +46,11 @@ public class NotificationUtils  {
             this.mContext = mContext;
         }
 
-        public void showNotificationMessage(String title, String message, String timeStamp, Intent intent) {
-            showNotificationMessage(title, message, timeStamp, intent, null);
+        public void showNotificationMessage(String title, String message,  Intent intent) {
+            showNotificationMessage(title, message,  intent, null);
         }
 
-        public void showNotificationMessage(final String title, final String message, final String timeStamp, Intent intent, String imageUrl) {
+        public void showNotificationMessage(final String title, final String message,  Intent intent, String imageUrl) {
             // Check for empty push message
             if (TextUtils.isEmpty(message))
                 return;
@@ -81,19 +81,19 @@ public class NotificationUtils  {
                     Bitmap bitmap = getBitmapFromURL(imageUrl);
 
                     if (bitmap != null) {
-                        showBigNotification(bitmap, mBuilder, icon, title, message, timeStamp, resultPendingIntent, alarmSound);
+                        showBigNotification(bitmap, mBuilder, icon, title, message, resultPendingIntent, alarmSound);
                     } else {
-                        showSmallNotification(mBuilder, icon, title, message, timeStamp, resultPendingIntent, alarmSound);
+                        showSmallNotification(mBuilder, icon, title, message, resultPendingIntent, alarmSound);
                     }
                 }
             } else {
-                showSmallNotification(mBuilder, icon, title, message, timeStamp, resultPendingIntent, alarmSound);
+                showSmallNotification(mBuilder, icon, title, message, resultPendingIntent, alarmSound);
                 playNotificationSound();
             }
         }
 
 
-        private void showSmallNotification(NotificationCompat.Builder mBuilder, int icon, String title, String message, String timeStamp, PendingIntent resultPendingIntent, Uri alarmSound) {
+        private void showSmallNotification(NotificationCompat.Builder mBuilder, int icon, String title, String message,  PendingIntent resultPendingIntent, Uri alarmSound) {
 
             NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
@@ -106,7 +106,7 @@ public class NotificationUtils  {
                     .setContentIntent(resultPendingIntent)
                     .setSound(alarmSound)
                     .setStyle(inboxStyle)
-                    .setWhen(getTimeMilliSec(timeStamp))
+                    //.setWhen(getTimeMilliSec(timeStamp))
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), icon))
                     .setContentText(message)
@@ -116,7 +116,7 @@ public class NotificationUtils  {
             notificationManager.notify(1, notification);
         }
 
-        private void showBigNotification(Bitmap bitmap, NotificationCompat.Builder mBuilder, int icon, String title, String message, String timeStamp, PendingIntent resultPendingIntent, Uri alarmSound) {
+        private void showBigNotification(Bitmap bitmap, NotificationCompat.Builder mBuilder, int icon, String title, String message,  PendingIntent resultPendingIntent, Uri alarmSound) {
             NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle();
             bigPictureStyle.setBigContentTitle(title);
             bigPictureStyle.setSummaryText(Html.fromHtml(message).toString());
@@ -128,7 +128,7 @@ public class NotificationUtils  {
                     .setContentIntent(resultPendingIntent)
                     .setSound(alarmSound)
                     .setStyle(bigPictureStyle)
-                    .setWhen(getTimeMilliSec(timeStamp))
+
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), icon))
                     .setContentText(message)

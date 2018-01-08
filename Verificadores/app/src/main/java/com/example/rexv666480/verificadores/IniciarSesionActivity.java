@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.rexv666480.verificadores.Entidades.Verificador;
+import com.example.rexv666480.verificadores.ServiciosWeb.Respuestas.RespSesion;
 import com.example.rexv666480.verificadores.ServiciosWeb.RetrofitClient;
 import com.example.rexv666480.verificadores.ServiciosWeb.ServiciosWeb;
 import com.example.rexv666480.verificadores.Utilerias.Loading;
@@ -43,24 +44,26 @@ public class IniciarSesionActivity extends AppCompatActivity {
                 ServiciosWeb sw =  retrofitClient.getRetrofit().create(ServiciosWeb.class);
                 Verificador veri = new Verificador();
                 veri.setContrasena(etContra.getText().toString());
-                veri.setNombre(etUsuario.getText().toString());
+                veri.setUsuario(etUsuario.getText().toString());
                 SharedPreferences settings = getSharedPreferences("MisPreferencias",context.getApplicationContext().MODE_PRIVATE);
                 String token = settings.getString("token","");
                 veri.setToken(token);
                 loading.ShowLoading("Cargando...");
 
-                sw.ValidaUsuario(veri).enqueue(new Callback<Verificador>() {
+                sw.ValidaUsuario(veri).enqueue(new Callback<RespSesion>() {
                     @Override
-                    public void onResponse(Call<Verificador> call, Response<Verificador> response) {
-                         Verificador verificador = response.body();
+                    public void onResponse(Call<RespSesion> call, Response<RespSesion> response) {
+                        RespSesion respSesion = response.body();
                         loading.CerrarLoading();
                         if(response.code() == 200)
                         {
                             try {
-                                    Intent intentRutas = new Intent(IniciarSesionActivity.this, VisitasActivity.class);
-                                    verificador.setId(1);
-                                    intentRutas.putExtra("paramVerificador", new Gson().toJson(verificador));
-                                    startActivity(intentRutas);
+                                    if((respSesion.getEstatus().toString().equals("200"))) {
+                                        Verificador verificador = respSesion.getVerificador();
+                                        Intent intentRutas = new Intent(IniciarSesionActivity.this, VisitasActivity.class);
+                                        intentRutas.putExtra("paramVerificador", new Gson().toJson(verificador));
+                                        startActivity(intentRutas);
+                                    }
                             }catch (Exception ex)
                             {
                                 Log.d(TAG,ex.getMessage());
@@ -69,7 +72,7 @@ public class IniciarSesionActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<Verificador> call, Throwable t) {
+                    public void onFailure(Call<RespSesion> call, Throwable t) {
                         loading.CerrarLoading();
                         Log.d(TAG,t.getMessage());
 
