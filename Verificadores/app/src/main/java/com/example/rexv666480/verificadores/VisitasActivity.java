@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.rexv666480.verificadores.Adapters.AdapterRuta;
 import com.example.rexv666480.verificadores.Adapters.AdapterRutas;
@@ -22,9 +23,11 @@ import com.example.rexv666480.verificadores.Entidades.Ruta;
 import com.example.rexv666480.verificadores.Entidades.Verificador;
 
 import com.example.rexv666480.verificadores.Entidades.Visita;
+import com.example.rexv666480.verificadores.Servicios.ServiceUbicacion;
 import com.example.rexv666480.verificadores.ServiciosWeb.Respuestas.RespVisitas;
 import com.example.rexv666480.verificadores.ServiciosWeb.RetrofitClient;
 import com.example.rexv666480.verificadores.ServiciosWeb.ServiciosWeb;
+import com.example.rexv666480.verificadores.Utilerias.AgenteServicioUbicacion;
 import com.example.rexv666480.verificadores.Utilerias.Loading;
 import com.example.rexv666480.verificadores.Utilerias.UbicacionActual;
 import com.google.android.gms.maps.model.LatLng;
@@ -39,6 +42,7 @@ import retrofit2.Response;
 
 public class VisitasActivity extends AppCompatActivity {
     private static final int ACCESS_FINE_LOCATION = 102;
+    private static final String TAG = "Actividad Visitas";
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -46,6 +50,9 @@ public class VisitasActivity extends AppCompatActivity {
     private Verificador verificador;
     Loading loading =null;
     Context context = null;
+    private List<Visita> visitasActuales= null;
+    AgenteServicioUbicacion agenteServicioUbicacion= null;
+
 
     Activity activity;
 
@@ -58,17 +65,29 @@ public class VisitasActivity extends AppCompatActivity {
             context = this;
             //obtenemos los parametros que se pasaron de la actividad
             Intent i = getIntent();
-            verificador = new Gson().fromJson(i.getStringExtra("paramVerificador"),Verificador.class);
             PermisoUbicacion();
             loading = new Loading(context);
-            ObtenerVisitas();
-            //Log.d("TOKEN",FirebaseInstanceId.getInstance().getToken());
-
+            verificador = new Gson().fromJson(i.getStringExtra("paramVerificador"), Verificador.class);
+            agenteServicioUbicacion = new AgenteServicioUbicacion(this);
 
         } catch (Exception ex) {
-            Log.d("Mensaje Verificadores", ex.getMessage());
+            Log.d(TAG, ex.getMessage());
+            Toast(ex.getMessage());
         }
     }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        try{
+            ObtenerVisitas();
+        }catch (Exception ex)
+        {
+            Log.d(TAG, ex.getMessage());
+            Toast(ex.getMessage());
+        }
+    }
+
+
     public  void ObtenerVisitas()
     {
         try
@@ -76,16 +95,17 @@ public class VisitasActivity extends AppCompatActivity {
             loading.ShowLoading("Descargando visitas pendientes");
             RetrofitClient retrofitClient  = new RetrofitClient();
             ServiciosWeb sw =  retrofitClient.getRetrofit().create(ServiciosWeb.class);
-            verificador.setId(1);
             sw.obtenerVisitas(verificador).enqueue(new Callback<RespVisitas>() {
                 @Override
                 public void onResponse(Call<RespVisitas> call, Response<RespVisitas> response) {
                     if(response.code() == 200)
                     {
+                        visitasActuales= null;
                         RespVisitas r = response.body();
                         if(r.getEstatus().toString().equals("200"))
                         {
                             mListView = (ListView) findViewById(R.id.lvRutasActuales);
+                            visitasActuales = r.getVisitas();
                             AdapterVisitas adapterVisita =  new AdapterVisitas(getApplicationContext(), r.getVisitas());
                             mListView.setAdapter(adapterVisita);
                             InitClickListView();
@@ -99,13 +119,13 @@ public class VisitasActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<RespVisitas> call, Throwable t) {
-
+                    Toast(t.getMessage());
                 }
             });
 
         }catch (Exception ex)
         {
-            throw  ex;
+            Toast(ex.getMessage());
         }
     }
 
@@ -118,15 +138,12 @@ public class VisitasActivity extends AppCompatActivity {
             // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale( this,
                     android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-
                 // Show an expanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
 
             } else {
-
                 // No explanation needed, we can request the permission.
-
                 ActivityCompat.requestPermissions(this,
                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                         ACCESS_FINE_LOCATION);
@@ -148,19 +165,39 @@ public class VisitasActivity extends AppCompatActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(visitasActuales!= null) {
+                    Visita visita = (Visita) parent.getItemAtPosition(position);
+                    int existVisita=ExisteVisitaInicida();
+                    if (visita.getIdEstatusVisita().equals("4"))
+                        Toast("Visita finalizada");
 
-                Intent intentMapa = new Intent(VisitasActivity.this, MainActivity.class);
-                UbicacionActual ubicacionActual = new UbicacionActual();
-                ubicacionActual.getLocation(activity);
-                Visita visita = (Visita) parent.getItemAtPosition(position);
-                //visita.getOrigen().setLatLng(new LatLng(ubicacionActual.getLatitude(),ubicacionActual.getLongitude()));
-                intentMapa.putExtra("paramVisita",  new Gson().toJson(visita));
-                intentMapa.putExtra("paramVerificador",  new Gson().toJson(verificador));
-                startActivity(intentMapa);
-
+                    else if((existVisita > 0 && existVisita ==  visita.getIdVisita()) || existVisita==0) {
+                        Intent intentMapa = new Intent(VisitasActivity.this, MainActivity.class);
+                         //visita.getOrigen().setLatLng(new LatLng(ubicacionActual.getLatitude(),ubicacionActual.getLongitude()));
+                        intentMapa.putExtra("paramVisita", new Gson().toJson(visita));
+                        intentMapa.putExtra("paramVerificador", new Gson().toJson(verificador));
+                        startActivity(intentMapa);
+                    }else
+                        Toast("No se puede iniciar 2 visitas al mismo tiempo, por favor finalize la anterior");
+                }
             }
         });
     }
+
+    public int ExisteVisitaInicida()
+    {
+        if(visitasActuales != null)
+            if(visitasActuales.size() > 0)
+            {
+               for(int i= 0 ; i< visitasActuales.size() ; i++)
+               {
+                   if(visitasActuales.get(i).getIdEstatusVisita().equals("2"))
+                       return visitasActuales.get(i).getIdVisita();
+               }
+            }
+        return  0;
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -175,10 +212,35 @@ public class VisitasActivity extends AppCompatActivity {
                 } else {
 
                 }
-
             }
-
         }
+    }
+
+    //Se llama cuando la actividad va a comenzar a interactuar con el usuario. Es un buen lugar para lanzar las animaciones y la música.
+    @Override protected void onResume() {
+        super.onResume();
+        ObtenerVisitas();
+        agenteServicioUbicacion.IniciarServicio(verificador);
+    }
+
+    // Indica que la actividad está a punto de ser lanzada a segundo plano, normalmente porque otra actividad es lanzada.
+    // Es el lugar adecuado para detener animaciones, música o almacenar los datos que estaban en edición.
+    @Override protected void onPause() {
+        Toast.makeText(this, "onPause", Toast.LENGTH_SHORT).show();
+        super.onPause();
+    }
+    //Indica que la actividad va a volver a ser representada después de haber pasado por onStop().
+    @Override protected void onRestart() {
+        super.onRestart();
+        Toast.makeText(this, "onRestart", Toast.LENGTH_SHORT).show();
+    }
+
+
+
+
+    public void Toast(String mensaje)
+    {
+        Toast.makeText(this,mensaje,Toast.LENGTH_SHORT).show();
     }
 
 }

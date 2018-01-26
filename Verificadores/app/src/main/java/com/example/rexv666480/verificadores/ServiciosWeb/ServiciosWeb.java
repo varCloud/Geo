@@ -9,6 +9,7 @@ import com.example.rexv666480.verificadores.ServiciosWeb.Respuestas.RespVisitas;
 import com.google.android.gms.safetynet.SafetyNetApi;
 
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -32,4 +33,7 @@ public interface ServiciosWeb {
 
     @POST("ValidaUsuario")
     Call<RespSesion> ValidaUsuario(@Body Verificador verfficador);
+
+    @POST("ActualizarEstatusVisitas")
+    Call< Map<String,String>> ActualizarEstatusVisitas(@Body Map<String,String>  estatusVisita);
 }

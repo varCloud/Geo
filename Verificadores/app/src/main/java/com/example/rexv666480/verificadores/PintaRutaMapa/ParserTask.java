@@ -69,7 +69,7 @@ public class ParserTask extends  AsyncTask<String, Integer, List<List<HashMap<St
 
             lineOptions.addAll(points);
             lineOptions.width(12);
-            lineOptions.color(Color.RED);
+            lineOptions.color(Color.BLUE);
             lineOptions.geodesic(true);
 
         }

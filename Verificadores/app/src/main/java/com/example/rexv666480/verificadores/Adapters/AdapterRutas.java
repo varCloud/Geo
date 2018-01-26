@@ -36,7 +36,7 @@ public class AdapterRutas extends RecyclerView.Adapter<AdapterRutas.PersonViewHo
             super(itemView);
             iconUbicacion = (ImageView)itemView.findViewById(R.id.iconUbicacion);
             descripcionRuta = (TextView)itemView.findViewById(R.id.descripcionRuta);
-            iconSiguiente = (ImageView)itemView.findViewById(R.id.iconSig);
+            //iconSiguiente = (ImageView)itemView.findViewById(R.id.iconSig);
         }
     }
 

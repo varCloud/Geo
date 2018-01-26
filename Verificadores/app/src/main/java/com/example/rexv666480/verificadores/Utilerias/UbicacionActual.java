@@ -16,6 +16,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import static android.content.Context.LOCATION_SERVICE;
 
 /**
@@ -68,7 +70,7 @@ public class UbicacionActual extends Service implements LocationListener {
                             MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                     Log.d("Network", "Network");
                     if (locationManager != null) {
-                          if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                             location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                             if (location != null) {
                                 latitude = location.getLatitude();
@@ -83,7 +85,7 @@ public class UbicacionActual extends Service implements LocationListener {
                         locationManager.requestLocationUpdates(
                                 LocationManager.GPS_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
-                                MIN_DISTANCE_CHANGE_FOR_UPDATES,this );
+                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                         Log.d("GPS Enabled", "GPS Enabled");
                         if (locationManager != null) {
                             location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -103,8 +105,8 @@ public class UbicacionActual extends Service implements LocationListener {
         return location;
     }
 
-    public double getLatitude(){
-        if(location != null){
+    public double getLatitude() {
+        if (location != null) {
             latitude = location.getLatitude();
         }
 
@@ -114,9 +116,9 @@ public class UbicacionActual extends Service implements LocationListener {
 
     /**
      * Function to get longitude
-     * */
-    public double getLongitude(){
-        if(location != null){
+     */
+    public double getLongitude() {
+        if (location != null) {
             longitude = location.getLongitude();
         }
 
@@ -124,8 +126,14 @@ public class UbicacionActual extends Service implements LocationListener {
         return longitude;
     }
 
+    public LatLng ObtenerLatLng()
+    {
+        return   new LatLng(this.location.getLatitude(),this.location.getLongitude());
+    }
+
     @Override
     public void onLocationChanged(Location location) {
+        this.location = location;
 
     }
 

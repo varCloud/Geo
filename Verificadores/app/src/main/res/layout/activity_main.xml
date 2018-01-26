@@ -15,70 +15,60 @@
         tools:layout_editor_absoluteX="8dp" />
 
 
-<LinearLayout
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/linearLayout"
-    android:layout_alignParentTop="true"
-    android:layout_alignParentStart="true">
-
-
-    <Button
-        android:id="@+id/btnIniciarNevegacion"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="iniciar"
-        android:textColor="@color/colorBlanco"
-        android:theme="@style/Botones" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
 
-    <Button
-        android:id="@+id/btnPausarRuta"
-        android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/btnIniciarNevegacion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="iniciar"
+            android:textColor="@color/colorBlanco"
+            android:theme="@style/Botones"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btnFinalizarVisita"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Finalizar"
+            android:textColor="@color/colorBlanco"
+            android:theme="@style/Botones"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/btnCancelarnavegacion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancelar"
+            android:textColor="@color/colorBlanco"
+            android:theme="@style/Botones"
+            android:layout_weight="1"/>
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Pausar Ruta"
-        android:background="@color/colorPrimaryDark"
-        android:textColor="@color/colorBlanco"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        />
-
-    <Button
-        android:id="@+id/btnCancelarRuta"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="Cancelar Ruta"
-        android:background="@color/colorPrimaryDark"
-        android:textColor="@color/colorBlanco"
-        android:theme="@style/Botones"
-        />
-
-
-
-</LinearLayout>
-
-
-
-    <!--<Button-->
-            <!--android:id="@+id/btnCancelarNevegacion"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:padding="5px"-->
-            <!--android:layout_margin="0px"-->
-            <!--android:text="Start navigation"-->
-            <!--android:background="@color/colorPrimaryDark"-->
-            <!--android:textColor="@color/cast_expanded_controller_progress_text_color"-->
-            <!--tools:layout_editor_absoluteY="0dp"-->
-            <!--tools:layout_editor_absoluteX="0dp" />-->
-        <!--<Button-->
-            <!--android:id="@+id/btnPausarrNevegacion"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:padding="5px"-->
-            <!--android:layout_margin="0px"-->
-            <!--android:text="Pausar Ruta"-->
-            <!--android:background="@color/colorPrimaryDark"-->
-            <!--android:textColor="@color/cast_expanded_controller_progress_text_color"-->
-            <!--tools:layout_editor_absoluteY="0dp"-->
-            <!--tools:layout_editor_absoluteX="0dp" />-->
-
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        >
+        <Button
+            android:id="@+id/btnComollegar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Como llegar"
+            android:textColor="@color/colorBlanco"
+            android:theme="@style/Botones"
+            android:layout_below="@id/ContenedorMapa"
+            />
+    </LinearLayout>
 </RelativeLayout>
+
+
+

@@ -1,8 +1,6 @@
 package com.example.rexv666480.verificadores.Adapters;
 
 import android.content.Context;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.rexv666480.verificadores.Entidades.Ruta;
 import com.example.rexv666480.verificadores.Entidades.Visita;
 import com.example.rexv666480.verificadores.R;
 
@@ -36,10 +33,17 @@ public class AdapterVisitas extends ArrayAdapter<Visita> {
         // Lookup view for data population
         TextView tvDescRuta = (TextView) convertView.findViewById(R.id.descripcionRuta);
         ImageView imgUbicacion = (ImageView) convertView.findViewById(R.id.iconUbicacion);
-        ImageView imgSig = (ImageView) convertView.findViewById(R.id.iconSig);
+
+        //ImageView imgSig = (ImageView) convertView.findViewById(R.id.iconSig);
         // Populate the data into the template view using the data object
         tvDescRuta.setText(visita.getDescripcionOrigen() +" -- "+ visita.getDescripcionDestino());
         // Return the completed view to render on screen
+        if(visita.getIdEstatusVisita().equals("1"))
+            imgUbicacion.setImageResource(R.drawable.pin_pendiente);
+        if(visita.getIdEstatusVisita().equals("2"))
+            imgUbicacion.setImageResource(R.drawable.pin);
+        if(visita.getIdEstatusVisita().equals("4"))
+            imgUbicacion.setImageResource(R.drawable.pin_terminado);
         return convertView;
     }
 }

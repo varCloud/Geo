@@ -1,15 +1,18 @@
 package com.example.rexv666480.verificadores.Servicios;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.example.rexv666480.verificadores.MainActivity;
-import com.example.rexv666480.verificadores.Utilerias.NotificationUtils;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.example.rexv666480.verificadores.R;
+import com.example.rexv666480.verificadores.VisitasActivity;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -22,9 +25,8 @@ import org.json.JSONObject;
 
 public class ServiceFCMPush extends FirebaseMessagingService {
 
-    private static final String TAG = "notificaciones push";
+    private static final String TAG = "Servicio Push";
 
-    private NotificationUtils notificationUtils;
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -51,57 +53,57 @@ public class ServiceFCMPush extends FirebaseMessagingService {
     }
 
     private void handleNotification(String message) {
-        if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
-            Log.e(TAG, "Notification Body: " + "Esta Primer Plano ");
-            // app is in foreground, broadcast the push message
-            Intent pushNotification = new Intent("pushNotification");
-            pushNotification.putExtra("message", message);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
 
-            // play notification sound
-            NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
-            notificationUtils.playNotificationSound();
-        }else{
-            Log.e(TAG, "Notification Body: " + "Esta en segungo plano ");
-        }
+        Intent intent = new Intent(this, VisitasActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 1410,
+                intent, PendingIntent.FLAG_ONE_SHOT);
+
+        NotificationCompat.Builder notificationBuilder = new
+                NotificationCompat.Builder(this)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("handleNotification")
+                .setContentText(message)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager)
+                        getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(1410, notificationBuilder.build());
     }
 
     private void handleDataMessage(JSONObject json) {
         Log.e(TAG, "push json: " + json.toString());
 
         try {
-            //JSONObject data = json.getJSONObject("data");
 
-            String title = json.getString("titulo");
-                String message = json.getString("mensaje");
-            String tipoNotificacion  = json.getString("tipoNotificacion");
-            Log.e(TAG, "title: " + title);
-            Log.e(TAG, "message: " + message);
-            Log.e(TAG, "tipoNotificacion: " + tipoNotificacion);
+            JSONObject data = json.getJSONObject("data");
+            String title = data.getString("titulo");
+            String message = data.getString("mensaje");
+            String tipoNotificacion = data.getString("tipoNotificacion");
 
-            if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
-                Log.e(TAG, "Notification Body: " + "Esta Primer Plano ");
-                Intent pushNotification = new Intent("OtraNotifiacion");
-                pushNotification.putExtra("message", tipoNotificacion);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
+            SonidoNotificacion();
+            NotificationCompat.Builder notificationBuilder = new
+                    NotificationCompat.Builder(this)
+                    .setSmallIcon(R.mipmap.logo)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setAutoCancel(true);
+            if(tipoNotificacion.equals("2")) {
 
-                // play notification sound
-                NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
-                notificationUtils.playNotificationSound();
-            } else {
-                Log.e(TAG, "Notification Body: " + "Esta en Segungo Plano");
-                // app is in background, show the notification in notification tray
-                Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
-                resultIntent.putExtra("message", tipoNotificacion);
-                showNotificationMessage(getApplicationContext(), title, message, resultIntent);
-                /*
-                if (TextUtils.isEmpty(imageUrl)) {
-                    showNotificationMessage(getApplicationContext(), title, message, timestamp, resultIntent);
-                } else {
-                    // image is present, show notification with image
-                    showNotificationMessageWithBigImage(getApplicationContext(), title, message, timestamp, resultIntent, imageUrl);
-                }*/
+                Intent intent = new Intent(this, VisitasActivity.class);
+                intent.putExtra("paramtipoNotificacion", tipoNotificacion);
+                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                PendingIntent pendingIntent = PendingIntent.getActivity(this, 1410, intent, PendingIntent.FLAG_ONE_SHOT);
+                notificationBuilder.setContentIntent(pendingIntent);
+                notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
             }
+            notificationBuilder.setDefaults(Notification.DEFAULT_ALL);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(1410, notificationBuilder.build());
+
         } catch (JSONException e) {
             Log.e(TAG, "Json Exception: " + e.getMessage());
         } catch (Exception e) {
@@ -109,21 +111,27 @@ public class ServiceFCMPush extends FirebaseMessagingService {
         }
     }
 
-    /**
-     * Showing notification with text only
-     */
-    private void showNotificationMessage(Context context, String title, String message,  Intent intent) {
-        notificationUtils = new NotificationUtils(context);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        notificationUtils.showNotificationMessage(title, message,  intent);
+    public void MuestraNotificacion()
+    {
+        try{
+
+        }catch (Exception ex)
+        {
+            Log.d(TAG , ex.getMessage());
+        }
+
     }
 
-    /**
-     * Showing notification with text and image
-     */
-    private void showNotificationMessageWithBigImage(Context context, String title, String message, String timeStamp, Intent intent, String imageUrl) {
-        notificationUtils = new NotificationUtils(context);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        notificationUtils.showNotificationMessage(title, message, intent, imageUrl);
+
+    public void SonidoNotificacion()
+    {
+        try {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+            r.play();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
 }

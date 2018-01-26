@@ -36,7 +36,7 @@ public class AdapterRuta extends ArrayAdapter<Ruta> {
         // Lookup view for data population
         TextView tvDescRuta = (TextView) convertView.findViewById(R.id.descripcionRuta);
         ImageView imgUbicacion = (ImageView) convertView.findViewById(R.id.iconUbicacion);
-        ImageView imgSig = (ImageView) convertView.findViewById(R.id.iconSig);
+        //ImageView imgSig = (ImageView) convertView.findViewById(R.id.iconSig);
         // Populate the data into the template view using the data object
         tvDescRuta.setText(ruta.getDescripcionRuta());
         // Return the completed view to render on screen

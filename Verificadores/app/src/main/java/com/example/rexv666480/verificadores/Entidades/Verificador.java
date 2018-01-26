@@ -14,7 +14,7 @@ public class Verificador {
     private int idVerificador;
     private String token;
     private String nombre;
-    private int idRuta;
+    private int idVisita;
     private String contrasena;
     private String usuario;
 
@@ -51,12 +51,12 @@ public class Verificador {
         this.usuario = usuario;
     }
 
-    public int getidRuta() {
-        return idRuta;
+    public int getidVisita() {
+        return idVisita;
     }
 
-    public void setidRuta(int idVisita) {
-        this.idRuta = idVisita;
+    public void setidVisita(int idVisita) {
+        this.idVisita = idVisita;
     }
 
 

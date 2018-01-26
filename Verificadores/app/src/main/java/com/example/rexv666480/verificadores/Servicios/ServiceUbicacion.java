@@ -29,12 +29,16 @@ import retrofit2.Response;
 
 public class ServiceUbicacion extends Service
 {
-    private static final String TAG = "BOOMBOOMTESTGPS";
+    private static final String TAG = "ServicioUbicacion";
     private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 6000 ; // seis segundos
-    private static final float LOCATION_DISTANCE = 10f; // 10 metros
+    private static final int LOCATION_INTERVAL = 3000 ; // seis segundos
+    private static final float LOCATION_DISTANCE = 0f; // 10 metros
     private RetrofitClient retrofitClient=null;
     private Verificador verificador;
+    LocationListener[] mLocationListeners = new LocationListener[] {
+            new LocationListener(LocationManager.GPS_PROVIDER),
+            new LocationListener(LocationManager.NETWORK_PROVIDER)
+    };
     @Override
     public IBinder onBind(Intent arg0)
     {
@@ -126,13 +130,13 @@ public class ServiceUbicacion extends Service
                 public void onResponse(Call<RespEstatus> call, Response<RespEstatus> response) {
                       if(response.code()==200) {
                           RespEstatus resp = response.body();
+                          Log.d(TAG,resp.getEstatus());
                           if(resp.getEstatus().toString().equals("1"))
                               Log.d(TAG,"actualizacion correcta");
                       }
                       else
                         Log.d(TAG,"Web servoce no responde con los parametros acutuales");
                 }
-
 
                 @Override
                 public void onFailure(Call<RespEstatus> call, Throwable t) {
@@ -173,11 +177,5 @@ public class ServiceUbicacion extends Service
             Log.e(TAG, "onStatusChanged: " + provider);
         }
     }
-
-    LocationListener[] mLocationListeners = new LocationListener[] {
-            new LocationListener(LocationManager.GPS_PROVIDER),
-            new LocationListener(LocationManager.NETWORK_PROVIDER)
-    };
-
 
 }

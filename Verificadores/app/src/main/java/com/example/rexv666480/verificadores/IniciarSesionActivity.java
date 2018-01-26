@@ -9,12 +9,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.rexv666480.verificadores.Entidades.Verificador;
 import com.example.rexv666480.verificadores.ServiciosWeb.Respuestas.RespSesion;
 import com.example.rexv666480.verificadores.ServiciosWeb.RetrofitClient;
 import com.example.rexv666480.verificadores.ServiciosWeb.ServiciosWeb;
 import com.example.rexv666480.verificadores.Utilerias.Loading;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 
 import retrofit2.Call;
@@ -48,6 +50,7 @@ public class IniciarSesionActivity extends AppCompatActivity {
                 SharedPreferences settings = getSharedPreferences("MisPreferencias",context.getApplicationContext().MODE_PRIVATE);
                 String token = settings.getString("token","");
                 veri.setToken(token);
+                veri.setToken(FirebaseInstanceId.getInstance().getToken());
                 loading.ShowLoading("Cargando...");
 
                 sw.ValidaUsuario(veri).enqueue(new Callback<RespSesion>() {
@@ -63,9 +66,11 @@ public class IniciarSesionActivity extends AppCompatActivity {
                                         Intent intentRutas = new Intent(IniciarSesionActivity.this, VisitasActivity.class);
                                         intentRutas.putExtra("paramVerificador", new Gson().toJson(verificador));
                                         startActivity(intentRutas);
+                                        finish();
                                     }
                             }catch (Exception ex)
                             {
+                                Toast(ex.getMessage());
                                 Log.d(TAG,ex.getMessage());
                             }
                         }
@@ -75,10 +80,16 @@ public class IniciarSesionActivity extends AppCompatActivity {
                     public void onFailure(Call<RespSesion> call, Throwable t) {
                         loading.CerrarLoading();
                         Log.d(TAG,t.getMessage());
+                        Toast(t.getMessage());
 
                     }
                 });
             }
         });
     }
+    public void Toast(String mensaje)
+    {
+        Toast.makeText(this,mensaje,Toast.LENGTH_SHORT).show();
+    }
+
 }

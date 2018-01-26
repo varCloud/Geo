@@ -1,5 +1,7 @@
 package com.example.rexv666480.verificadores.Entidades;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Created by rexv666480 on 05/01/2018.
  */
@@ -17,6 +19,23 @@ public class Visita {
     private String idEstatusVisita;
     private String km;
     private String timepoEstimado;
+
+    private LatLng origen;
+    private LatLng destino;
+
+    public LatLng getOrigen() {
+        return  new LatLng(Double.parseDouble(this.latitudOrigen),Double.parseDouble(this.longitudOrigen));
+    }
+
+
+
+    public LatLng getDestino() {
+        return  new LatLng(Double.parseDouble(this.latitudDestino),Double.parseDouble(this.longituDestino));
+    }
+
+    public void setDestino(LatLng destino) {
+        this.destino = destino;
+    }
 
     public int getIdVisita() {
         return idVisita;
