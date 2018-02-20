@@ -13,9 +13,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/logo_cir"
         android:supportsRtl="true"
+        android:screenOrientation="portrait"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity"
-            android:theme="@android:style/Theme.NoTitleBar"></activity>
+           ></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -25,11 +26,13 @@
             android:value="@integer/google_play_services_version" />
 
         <activity android:name=".VisitasActivity"
-            android:label="Visitas Actuales">
+            android:label="Visitas Actuales"
+            android:screenOrientation="portrait" >
 
         </activity>
         <activity android:name=".IniciarSesionActivity"
-                  android:label="App-GEO">
+                  android:label="App-GEO"
+            android:screenOrientation="portrait" >
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -31,7 +31,7 @@ public class ServiceUbicacion extends Service
 {
     private static final String TAG = "ServicioUbicacion";
     private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 3000 ; // seis segundos
+    private static final int LOCATION_INTERVAL = 5000 ; // seis segundos
     private static final float LOCATION_DISTANCE = 0f; // 10 metros
     private RetrofitClient retrofitClient=null;
     private Verificador verificador;
@@ -48,9 +48,15 @@ public class ServiceUbicacion extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        Log.e(TAG, "onStartCommand");
-        super.onStartCommand(intent, flags, startId);
-        verificador = new Gson().fromJson(intent.getStringExtra("paramVerificador"), Verificador.class);
+        try {
+            Log.e(TAG, "onStartCommand");
+            super.onStartCommand(intent, flags, startId);
+            verificador = new Gson().fromJson(intent.getStringExtra("paramVerificador"), Verificador.class);
+
+        }catch (Exception ex)
+        {
+            Log.d(TAG,ex.getMessage());
+        }
         return START_STICKY;
     }
 
@@ -96,13 +102,18 @@ public class ServiceUbicacion extends Service
     }
 
     private void initializeLocationManager() {
-        Log.e(TAG, "initializeLocationManager");
-        if (mLocationManager == null) {
-            mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        }
+        try{
+            Log.e(TAG, "initializeLocationManager");
+            if (mLocationManager == null) {
+                mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+            }
 
-        if (retrofitClient == null) {
-            retrofitClient = new RetrofitClient();
+            if (retrofitClient == null) {
+                retrofitClient = new RetrofitClient();
+            }
+        }catch (Exception ex)
+        {
+            Log.d(TAG, ex.getMessage());
         }
 
     }
@@ -120,29 +131,37 @@ public class ServiceUbicacion extends Service
         @Override
         public void onLocationChanged(Location location)
         {
-            Log.e(TAG, "onLocationChanged: " + location);
-            mLastLocation.set(location);
-            ServiciosWeb sw =  retrofitClient.getRetrofit().create(ServiciosWeb.class);
-            LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
-            verificador.setUbicacion(new Ubicacion(latLng , "Ubicacion Actual del Operador"));
-            sw.enviarUbicacionActual(verificador).enqueue(new Callback<RespEstatus>() {
-                @Override
-                public void onResponse(Call<RespEstatus> call, Response<RespEstatus> response) {
-                      if(response.code()==200) {
-                          RespEstatus resp = response.body();
-                          Log.d(TAG,resp.getEstatus());
-                          if(resp.getEstatus().toString().equals("1"))
-                              Log.d(TAG,"actualizacion correcta");
-                      }
-                      else
-                        Log.d(TAG,"Web servoce no responde con los parametros acutuales");
-                }
+            try {
+                Log.e(TAG, "onLocationChanged: " + location);
+                mLastLocation.set(location);
+                ServiciosWeb sw = retrofitClient.getRetrofit().create(ServiciosWeb.class);
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                verificador.setUbicacion(new Ubicacion(latLng, "Ubicacion Actual del Operador"));
+                sw.enviarUbicacionActual(verificador).enqueue(new Callback<RespEstatus>() {
+                    @Override
+                    public void onResponse(Call<RespEstatus> call, Response<RespEstatus> response) {
+                        if (response.code() == 200) {
+                            RespEstatus resp = response.body();
+                            Log.d(TAG, resp.getEstatus());
+                            if (resp.getEstatus().toString().equals("1"))
+                                Log.d(TAG, "actualizacion correcta");
+                        } else
+                            Log.d(TAG, "Web servoce no responde con los parametros acutuales");
+                    }
 
-                @Override
-                public void onFailure(Call<RespEstatus> call, Throwable t) {
-                        Log.d(TAG,t.getMessage());
-                }
-            });
+                    @Override
+                    public void onFailure(Call<RespEstatus> call, Throwable t) {
+                        try {
+                            throw  t;
+                        } catch (Throwable throwable) {
+                            throwable.printStackTrace();
+                        }
+                    }
+                });
+            }catch (Exception ex)
+            {
+                Log.d(TAG, ex.getMessage());
+            }
             /* UNA MANERA DIFERENTE DE REALIZAR UNA LLAMADA A UN WEB SERVICE CON RETROFIT
             Call<Respuesta> res = sw.enviarUbicacionActual(new Verificador());
             res.enqueue(new Callback<Respuesta>() {

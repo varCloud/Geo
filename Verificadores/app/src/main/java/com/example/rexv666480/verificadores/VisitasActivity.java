@@ -59,6 +59,7 @@ public class VisitasActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         try {
+
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_visitas);
             activity = this;
@@ -109,6 +110,8 @@ public class VisitasActivity extends AppCompatActivity {
                             AdapterVisitas adapterVisita =  new AdapterVisitas(getApplicationContext(), r.getVisitas());
                             mListView.setAdapter(adapterVisita);
                             InitClickListView();
+                            verificador.setidVisita(ExisteVisitaInicida());
+                            agenteServicioUbicacion.IniciarServicio(verificador);
                         }
                     }else{
 
@@ -220,23 +223,19 @@ public class VisitasActivity extends AppCompatActivity {
     @Override protected void onResume() {
         super.onResume();
         ObtenerVisitas();
-        agenteServicioUbicacion.IniciarServicio(verificador);
     }
 
     // Indica que la actividad está a punto de ser lanzada a segundo plano, normalmente porque otra actividad es lanzada.
     // Es el lugar adecuado para detener animaciones, música o almacenar los datos que estaban en edición.
     @Override protected void onPause() {
-        Toast.makeText(this, "onPause", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onPause", Toast.LENGTH_SHORT).show();
         super.onPause();
     }
     //Indica que la actividad va a volver a ser representada después de haber pasado por onStop().
     @Override protected void onRestart() {
         super.onRestart();
-        Toast.makeText(this, "onRestart", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onRestart", Toast.LENGTH_SHORT).show();
     }
-
-
-
 
     public void Toast(String mensaje)
     {
