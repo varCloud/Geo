@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.rexv666480.verificadores.Adapters.AdapterRuta;
@@ -29,6 +30,7 @@ import com.example.rexv666480.verificadores.ServiciosWeb.RetrofitClient;
 import com.example.rexv666480.verificadores.ServiciosWeb.ServiciosWeb;
 import com.example.rexv666480.verificadores.Utilerias.AgenteServicioUbicacion;
 import com.example.rexv666480.verificadores.Utilerias.Loading;
+import com.example.rexv666480.verificadores.Utilerias.NotificacionToast;
 import com.example.rexv666480.verificadores.Utilerias.UbicacionActual;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -52,6 +54,8 @@ public class VisitasActivity extends AppCompatActivity {
     Context context = null;
     private List<Visita> visitasActuales= null;
     AgenteServicioUbicacion agenteServicioUbicacion= null;
+    private NotificacionToast notificacionToast=null;
+    private TextView txtMensajeVisita = null;
 
 
     Activity activity;
@@ -63,12 +67,15 @@ public class VisitasActivity extends AppCompatActivity {
             setContentView(R.layout.activity_visitas);
             activity = this;
             context = this;
+            notificacionToast = new NotificacionToast(context);
             //obtenemos los parametros que se pasaron de la actividad
             Intent i = getIntent();
             PermisoUbicacion();
             loading = new Loading(context);
             verificador = new Gson().fromJson(i.getStringExtra("paramVerificador"), Verificador.class);
             agenteServicioUbicacion = new AgenteServicioUbicacion(this);
+            txtMensajeVisita = (TextView) findViewById(R.id.txtMensajeVisita);
+            txtMensajeVisita.setVisibility(View.INVISIBLE);
 
         } catch (Exception ex) {
             Log.d(TAG, ex.getMessage());
@@ -104,11 +111,18 @@ public class VisitasActivity extends AppCompatActivity {
                         RespVisitas r = response.body();
                         if(r.getEstatus().toString().equals("200"))
                         {
-                            mListView = (ListView) findViewById(R.id.lvRutasActuales);
-                            visitasActuales = r.getVisitas();
-                            AdapterVisitas adapterVisita =  new AdapterVisitas(getApplicationContext(), r.getVisitas());
-                            mListView.setAdapter(adapterVisita);
-                            InitClickListView();
+                            if(r.getVisitas() != null) {
+                                txtMensajeVisita.setVisibility(View.INVISIBLE);
+                                mListView = (ListView) findViewById(R.id.lvRutasActuales);
+                                visitasActuales = r.getVisitas();
+                                AdapterVisitas adapterVisita = new AdapterVisitas(getApplicationContext(), r.getVisitas());
+                                mListView.setAdapter(adapterVisita);
+                                InitClickListView();
+                            }else {
+                                notificacionToast.Show(r.getMensaje());
+                                txtMensajeVisita.setVisibility(View.VISIBLE);
+                                txtMensajeVisita.setText(r.getMensaje());
+                            }
                         }
                     }else{
 
