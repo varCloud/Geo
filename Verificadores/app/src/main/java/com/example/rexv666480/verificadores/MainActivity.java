@@ -63,26 +63,35 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
 
-        MapFragment mapFragment = (MapFragment) getFragmentManager()
-                .findFragmentById(R.id.ContenedorMapa);
-        mapFragment.getMapAsync(this);
-        loading = new Loading(this);
-        btnIniciarNavegacion = (Button) findViewById(R.id.btnIniciarNevegacion);
-        btnComollegar = (Button) findViewById(R.id.btnComollegar);
-        btnCancelar = (Button) findViewById(R.id.btnCancelarnavegacion);
-        btnFinalizar = (Button) findViewById(R.id.btnFinalizarVisita);
-        this.activity = this;
-        Intent i = getIntent();
-        visita = new Gson().fromJson(i.getStringExtra("paramVisita"),Visita.class);
-        verificador = new Gson().fromJson(i.getStringExtra("paramVerificador"),Verificador.class);
-        ubicacionActual = new UbicacionActual();
-        initClicksBotones();
-        agenteServicioUbicacion = new AgenteServicioUbicacion(this);
-//        if(visita.getIdEstatusVisita().equals("2"))
-//            btnIniciarNavegacion.setVisibility(View.INVISIBLE);
+            MapFragment mapFragment = (MapFragment) getFragmentManager()
+                    .findFragmentById(R.id.ContenedorMapa);
+            mapFragment.getMapAsync(this);
+            loading = new Loading(this);
+            btnIniciarNavegacion = (Button) findViewById(R.id.btnIniciarNevegacion);
+            btnComollegar = (Button) findViewById(R.id.btnComollegar);
+            btnCancelar = (Button) findViewById(R.id.btnCancelarnavegacion);
+            btnFinalizar = (Button) findViewById(R.id.btnFinalizarVisita);
+            this.activity = this;
+            Intent i = getIntent();
+            visita = new Gson().fromJson(i.getStringExtra("paramVisita"), Visita.class);
+            verificador = new Gson().fromJson(i.getStringExtra("paramVerificador"), Verificador.class);
+            ubicacionActual = new UbicacionActual();
+            initClicksBotones();
+            agenteServicioUbicacion = new AgenteServicioUbicacion(this);
+            if(visita.getIdEstatusVisita().toString().equals("2")) {
+                verificador.setidVisita(visita.getIdVisita());
+                agenteServicioUbicacion.IniciarServicio(verificador);
+            }
+        }catch(Exception ex)
+        {
+            throw  ex;
+
+        }
+
 
     }
 
@@ -179,28 +188,39 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
                 final LatLng dest = (LatLng) markerPoints.get(1);
 
                 // Getting URL to the Google Directions API
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                loading.CerrarLoading();
+                builder.include(origin);
+                builder.include(dest);
+                LatLngBounds bounds = builder.build();
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 100);
+                mMap.animateCamera(cu);
+
                 String url = getDirectionsUrl(origin, dest);
                 DownloadTask downloadTask = new DownloadTask(new AsyncResponse() {
                     @Override
                     public void processFinish(PolylineOptions output) {
                         try {
                             loading.CerrarLoading();
-                            mMap.addPolyline(output);
-                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                            builder.include(origin);
-                            builder.include(dest);
-                            LatLngBounds bounds = builder.build();
-                            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 100);
-                            mMap.animateCamera(cu);
+                            if(output != null) {
+                                mMap.addPolyline(output);
+                                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                builder.include(origin);
+                                builder.include(dest);
+                                LatLngBounds bounds = builder.build();
+                                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 100);
+                                mMap.animateCamera(cu);
+                            }else
+                                Toast("Las lineas del mapa son null");
                             //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom((LatLng) markerPoints.get(0), 10F));
                         } catch (Exception ex) {
                             Log.d("error verificador", ex.getMessage());
                         }
                     }
                 });
-
                 // se consume el web service de  Google Directions API hasta 2500 peticiones diarias
-                downloadTask.execute(url);
+
+               // downloadTask.execute(url); para pintar la ruta
             }
         }catch (Exception ex)
         {
@@ -237,8 +257,9 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
         if (markerPoints.size() == 1) {
             options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             options.title("Usted esta Aqui");
+
         } else if (markerPoints.size() == 2) {
-            options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             options.title("Destino");
 
         }

@@ -89,7 +89,12 @@ public class IniciarSesionActivity extends AppCompatActivity {
     }
     public void Toast(String mensaje)
     {
-        Toast.makeText(this,mensaje,Toast.LENGTH_SHORT).show();
+        try {
+            Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
+        }catch (Exception ex)
+        {
+            Log.d(TAG,ex.getMessage());
+        }
     }
 
 }

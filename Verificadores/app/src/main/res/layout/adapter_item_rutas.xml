@@ -26,6 +26,7 @@
             android:layout_gravity="center_vertical"
             android:gravity="center"
             android:text="Vista a los  inicial a los verificador de prue"
+            android:textColor="@color/colorPrimaryDark"
             android:textSize="15sp" />
 
     </LinearLayout>
