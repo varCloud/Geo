@@ -29,7 +29,9 @@
             android:text="iniciar"
             android:textColor="@color/colorBlanco"
             android:theme="@style/Botones"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:tag="2"
+            />
 
         <Button
             android:id="@+id/btnFinalizarVisita"

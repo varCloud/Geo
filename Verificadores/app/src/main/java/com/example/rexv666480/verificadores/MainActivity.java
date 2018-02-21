@@ -25,6 +25,7 @@ import com.example.rexv666480.verificadores.ServiciosWeb.ServiciosWeb;
 import com.example.rexv666480.verificadores.Utilerias.AgenteServicioUbicacion;
 import com.example.rexv666480.verificadores.Utilerias.Alert;
 import com.example.rexv666480.verificadores.Utilerias.Loading;
+import com.example.rexv666480.verificadores.Utilerias.NotificacionToast;
 import com.example.rexv666480.verificadores.Utilerias.UbicacionActual;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
     Loading loading;
     Activity activity;
     UbicacionActual ubicacionActual;
+    NotificacionToast notificacionToast=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,14 +84,16 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
             ubicacionActual = new UbicacionActual();
             initClicksBotones();
             agenteServicioUbicacion = new AgenteServicioUbicacion(this);
+            notificacionToast= new NotificacionToast(getApplicationContext());
             if(visita.getIdEstatusVisita().toString().equals("2")) {
                 verificador.setidVisita(visita.getIdVisita());
                 agenteServicioUbicacion.IniciarServicio(verificador);
+                btnIniciarNavegacion.setText("PAUSAR");
+                btnIniciarNavegacion.setTag("3");
             }
         }catch(Exception ex)
         {
             throw  ex;
-
         }
 
 
@@ -116,7 +120,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
             btnIniciarNavegacion.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ActualizarVisita("2");
+                    ActualizarVisita(btnIniciarNavegacion.getTag().toString());
                 }
             });
 
@@ -139,28 +143,6 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
         }
     }
 
-    public void IniciarServicio()
-    {
-        try {
-            Intent intentServicio = new Intent(this, ServiceUbicacion.class);
-            intentServicio.putExtra("paramVerificador", new Gson().toJson(verificador));
-            startService(intentServicio);
-        }catch (Exception ex)
-        {
-            Toast(ex.getMessage());
-        }
-    }
-
-    public void DetenerServicio()
-    {
-        try {
-            Intent intentServicio = new Intent(this, ServiceUbicacion.class);
-            stopService(intentServicio);
-        }catch (Exception ex)
-        {
-            Toast(ex.getMessage());
-        }
-    }
 
     @Override
     public void onMapReady(final GoogleMap mMapa) {
@@ -179,8 +161,9 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
             // Adding new item to the ArrayList
             ubicacionActual.getLocation(this.activity);
-            AgregarMarker(ubicacionActual.ObtenerLatLng());
-            AgregarMarker(visita.getOrigen());
+           // AgregarMarker(ubicacionActual.ObtenerLatLng());
+            AgregarMarker(visita.getOrigen(),visita.getDescripcionOrigen());
+            AgregarMarker(visita.getDestino(),visita.getDescripcionDestino());
 
             // Checks, whether start and end locations are captured
             if (markerPoints.size() >= 2) {
@@ -189,14 +172,20 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
                 // Getting URL to the Google Directions API
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                loading.CerrarLoading();
+
                 builder.include(origin);
                 builder.include(dest);
                 LatLngBounds bounds = builder.build();
-                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 100);
-                mMap.animateCamera(cu);
+                int width = getResources().getDisplayMetrics().widthPixels;
+                int height = getResources().getDisplayMetrics().heightPixels;
+                int padding = (int) (width * 0.12);
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
 
-                String url = getDirectionsUrl(origin, dest);
+                mMap.moveCamera(cu);
+                //mMap.animateCamera(cu);
+                mMap.moveCamera(CameraUpdateFactory.zoomTo(14.5F));
+                loading.CerrarLoading();
+                //String url = getDirectionsUrl(origin, dest);
                 DownloadTask downloadTask = new DownloadTask(new AsyncResponse() {
                     @Override
                     public void processFinish(PolylineOptions output) {
@@ -224,7 +213,8 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
             }
         }catch (Exception ex)
         {
-            Log.d(TAG,ex.getMessage());
+            loading.CerrarLoading();
+           notificacionToast.Show(ex.getMessage());
         }
 
     }
@@ -248,7 +238,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
         return false;
     }
 
-    private void AgregarMarker(LatLng latLng)
+    private void AgregarMarker(LatLng latLng, String descripcion)
     {
         markerPoints.add(latLng);
         MarkerOptions options = new MarkerOptions();
@@ -256,11 +246,11 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
         if (markerPoints.size() == 1) {
             options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            options.title("Usted esta Aqui");
+            options.title("Origen: "+descripcion);
 
         } else if (markerPoints.size() == 2) {
             options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-            options.title("Destino");
+            options.title("Destino: "+descripcion);
 
         }
 
@@ -339,7 +329,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
                             Toast("Ocurrio un error al actulizar la visita "+map.get("msj"));
                         }else
                         {
-                            if(estatus.equals("2")) {
+                            if(estatus.equals("2") || estatus.equals("3") ) {
                                 verificador.setidVisita(visita.getIdVisita());
                                 agenteServicioUbicacion.IniciarServicio(verificador);
                             }else
