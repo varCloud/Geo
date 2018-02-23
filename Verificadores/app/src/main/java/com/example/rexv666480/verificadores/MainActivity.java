@@ -5,12 +5,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -27,6 +30,7 @@ import com.example.rexv666480.verificadores.Utilerias.Alert;
 import com.example.rexv666480.verificadores.Utilerias.Loading;
 import com.example.rexv666480.verificadores.Utilerias.NotificacionToast;
 import com.example.rexv666480.verificadores.Utilerias.UbicacionActual;
+
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -44,12 +48,34 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import butterknife.BindAnim;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity  implements OnMapReadyCallback ,GoogleMap.OnMarkerClickListener{
-//AIzaSyC3NUL0UP9ON9VPD-RocNdgovfKXFEa9Nc
+public class MainActivity extends AppCompatActivity  implements  View.OnClickListener ,OnMapReadyCallback ,GoogleMap.OnMarkerClickListener{
+    @BindView(R.id.faComollegar)
+    FloatingActionButton faComollegar;
+    @BindView(R.id.faCanecelar)
+    FloatingActionButton faCanecelar;
+    @BindView(R.id.faFinalizar)
+    FloatingActionButton faFinalizar;
+    @BindView(R.id.faIniciar)
+    FloatingActionButton faIniciar;
+    @BindView(R.id.faMenu)
+    FloatingActionButton faMenu;
+
+    @BindAnim(R.anim.scale_up)
+    Animation scale_up;
+    @BindAnim(R.anim.scale_down)
+    Animation scale_down;
+    @BindAnim(R.anim.show_from_bottom)
+    Animation show_from_bottom;
+//    @BindView(R.id.menu_yellow)
+//    FloatingActionMenu menuYellow;
+
     private static final int ACCESS_FINE_LOCATION = 102;
     private static final String TAG ="Actividad MAIN";
     private AgenteServicioUbicacion agenteServicioUbicacion=null;
@@ -62,16 +88,33 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
     Activity activity;
     UbicacionActual ubicacionActual;
     NotificacionToast notificacionToast=null;
+    private Animation fab_open,fab_close,rotate_forward,rotate_backward;
+    private Boolean isFabOpen = false;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         try {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
-
+            ButterKnife.bind(this);
             MapFragment mapFragment = (MapFragment) getFragmentManager()
                     .findFragmentById(R.id.ContenedorMapa);
             mapFragment.getMapAsync(this);
+            /*  --------------------------ANIMACIONES ------------------------------------------*/
+                fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
+                fab_close = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
+                rotate_forward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_forward);
+                rotate_backward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_backward);
+               // menuYellow.hideMenuButton(false);
+            /*---------------------FIN DE ANIMACIONES --------------------------------------------*/
+            faComollegar.setOnClickListener(this);
+            faMenu.setOnClickListener(this);
+            faIniciar.setOnClickListener(this);
+            faFinalizar.setOnClickListener(this);
+            faCanecelar.setOnClickListener(this);
+            /*--------------------------------------------------------------------------------------------*/
             loading = new Loading(this);
             btnIniciarNavegacion = (Button) findViewById(R.id.btnIniciarNevegacion);
             btnComollegar = (Button) findViewById(R.id.btnComollegar);
@@ -85,6 +128,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
             initClicksBotones();
             agenteServicioUbicacion = new AgenteServicioUbicacion(this);
             notificacionToast= new NotificacionToast(getApplicationContext());
+
             if(visita.getIdEstatusVisita().toString().equals("2")) {
                 verificador.setidVisita(visita.getIdVisita());
                 agenteServicioUbicacion.IniciarServicio(verificador);
@@ -99,10 +143,46 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
 
     }
 
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        String tag = "";
+        switch (id){
+            case R.id.faMenu:
+                animateFAB();
+                break;
+            case R.id.faIniciar:
+                tag = v.getTag().toString();
+                ActualizarVisita(tag);
+                break;
+            case R.id.faCanecelar:
+                tag = v.getTag().toString();
+                ActualizarVisita(tag);
+                break;
+            case R.id.faComollegar:
+            case R.id.btnComollegar:
+                if (ContextCompat.checkSelfPermission(getApplication(),android.Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    Comollegar();
+                }else
+                {
+                    ActivityCompat.requestPermissions(activity,
+                            new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                            ACCESS_FINE_LOCATION);
+                }
+                break;
+            case R.id.faFinalizar:
+                tag = v.getTag().toString();
+                ActualizarVisita(tag);
+                break;
+        }
+    }
+
     public void initClicksBotones()
     {
         try{
-            btnComollegar.setOnClickListener(new View.OnClickListener() {
+                btnComollegar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (ContextCompat.checkSelfPermission(getApplication(),android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -120,6 +200,15 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
             btnIniciarNavegacion.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if(btnIniciarNavegacion.getTag().equals("2"))
+                    {
+                        btnIniciarNavegacion.setTag("3");
+                        btnIniciarNavegacion.setText("PAUSAR");
+                    }else
+                    {
+                        btnIniciarNavegacion.setTag("2");
+                        btnIniciarNavegacion.setText("INICIAR");
+                    }
                     ActualizarVisita(btnIniciarNavegacion.getTag().toString());
                 }
             });
@@ -130,6 +219,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
                     ActualizarVisita("5");
                 }
             });
+
             btnFinalizar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -309,6 +399,7 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
             Log.d(TAG,ex.getMessage());
         }
     }
+
     public void ActualizarVisita(final String estatus)
     {
         try
@@ -355,11 +446,51 @@ public class MainActivity extends AppCompatActivity  implements OnMapReadyCallba
         }
 
     }
+
     public void Toast(String mensaje)
     {
         Toast.makeText(this,mensaje,Toast.LENGTH_SHORT).show();
     }
 
+    public void animateFAB(){
 
+        try{
+
+        if(isFabOpen){
+
+            faMenu.startAnimation(rotate_backward);
+            faComollegar.startAnimation(fab_close);
+            faIniciar.startAnimation(fab_close);
+            faFinalizar.startAnimation(fab_close);
+            faCanecelar.startAnimation(fab_close);
+
+            faCanecelar.setClickable(false);
+            faFinalizar.setClickable(false);
+            faCanecelar.setClickable(false);
+            faFinalizar.setClickable(false);
+            isFabOpen = false;
+            Log.d("Raj", "close");
+            faMenu.setImageResource(R.mipmap.ic_menu);
+
+        } else {
+            faMenu.startAnimation(rotate_forward);
+            faComollegar.startAnimation(fab_open);
+            faIniciar.startAnimation(fab_open);
+            faFinalizar.startAnimation(scale_up);
+            faCanecelar.startAnimation(scale_up);
+            faComollegar.setClickable(true);
+            faIniciar.setClickable(true);
+            faFinalizar.setClickable(true);
+            faCanecelar.setClickable(true);
+            isFabOpen = true;
+            faMenu.setImageResource(R.mipmap.ic_close);
+            Log.d("Raj","open");
+
+        }
+        }catch (Exception ex)
+        {
+            throw  ex;
+        }
+    }
 
 }

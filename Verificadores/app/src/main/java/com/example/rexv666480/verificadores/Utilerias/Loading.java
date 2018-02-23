@@ -19,7 +19,7 @@ public class Loading {
     public  void ShowLoading( String  mensaje)
     {
         progressDialog.setMessage(mensaje); // Setting Message
-        progressDialog.setTitle("GEO"); // Setting Title
+        //progressDialog.setTitle("GEO"); // Setting Title
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER); // Progress Dialog Style Spinner
         progressDialog.show(); // Display Progress Dialog
         progressDialog.setCancelable(false);

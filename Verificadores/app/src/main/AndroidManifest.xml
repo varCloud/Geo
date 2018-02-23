@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/logo_cir"
         android:supportsRtl="true"
         android:screenOrientation="portrait"
-        android:theme="@style/AppTheme">
+        android:theme="@style/FullScreen">
         <activity android:name=".MainActivity"
            ></activity>
 
@@ -32,17 +32,17 @@
         </activity>
         <activity android:name=".IniciarSesionActivity"
                   android:label="App-GEO"
+            android:theme="@style/FullScreen"
             android:screenOrientation="portrait" >
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"
                         android:screenOrientation="portrait" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <service android:name=".Servicios.ServiceUbicacion" />
+
         <service android:name=".Servicios.ServiceFCMPush">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

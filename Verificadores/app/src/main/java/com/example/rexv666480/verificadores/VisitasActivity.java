@@ -56,9 +56,8 @@ public class VisitasActivity extends AppCompatActivity {
     AgenteServicioUbicacion agenteServicioUbicacion= null;
     private NotificacionToast notificacionToast=null;
     private TextView txtMensajeVisita = null;
-
-
     Activity activity;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +68,6 @@ public class VisitasActivity extends AppCompatActivity {
             activity = this;
             context = this;
             notificacionToast = new NotificacionToast(context);
-            //obtenemos los parametros que se pasaron de la actividad
             Intent i = getIntent();
             PermisoUbicacion();
             loading = new Loading(context);
@@ -94,7 +92,6 @@ public class VisitasActivity extends AppCompatActivity {
             Toast(ex.getMessage());
         }
     }
-
 
     public  void ObtenerVisitas()
     {
@@ -126,7 +123,6 @@ public class VisitasActivity extends AppCompatActivity {
                                 txtMensajeVisita.setVisibility(View.VISIBLE);
                                 txtMensajeVisita.setText(r.getMensaje());
                             }
-
                         }
                     }else{
 
@@ -137,6 +133,7 @@ public class VisitasActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<RespVisitas> call, Throwable t) {
+                    loading.CerrarLoading();
                     Toast(t.getMessage());
                 }
             });
@@ -156,24 +153,15 @@ public class VisitasActivity extends AppCompatActivity {
             // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale( this,
                     android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // Show an expanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
 
             } else {
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                         ACCESS_FINE_LOCATION);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
             }
         }else
         {
-            //Intent intent = new Intent(this, ServiceUbicacion.class);
-            //startService(intent);
         }
     }
 
@@ -227,8 +215,9 @@ public class VisitasActivity extends AppCompatActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                         //Intent intent = new Intent(this, ServiceUbicacion.class);
                         //startService(intent);
+                         ObtenerVisitas();
                 } else {
-
+                        PermisoUbicacion();
                 }
             }
         }

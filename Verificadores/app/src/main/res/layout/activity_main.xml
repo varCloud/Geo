@@ -6,13 +6,102 @@
     android:layout_height="match_parent"
     tools:context="com.example.rexv666480.verificadores.MainActivity">
 
+    <!--MENU-->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/faMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_menu"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="end|bottom"
+        app:backgroundTint="@color/colorAzul2"
+        android:layout_marginBottom="50dp"
+        android:layout_marginRight="10dp"
+        android:clickable="true"
+
+        />
+
+    <!--COMO LLEGAR-->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/faComollegar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_chart_line_stacked"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/faMenu"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="15dp"
+        android:layout_marginRight="10dp"
+        android:clickable="true"
+        app:backgroundTint="@color/colorRosa"
+        android:visibility="invisible"
+        />
+
+    <!--CANCELAR-->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/faCanecelar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_close"
+        android:layout_gravity="end|bottom"
+        android:layout_above="@+id/faComollegar"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="15dp"
+        android:clickable="true"
+        app:backgroundTint="@color/colorRojo"
+        android:layout_marginRight="10dp"
+        android:tag="5"
+        android:visibility="invisible"
+
+        />
+
+    <!--FINALIZAR-->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/faFinalizar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_check"
+        android:layout_gravity="end|bottom"
+        android:layout_above="@+id/faCanecelar"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="15dp"
+        android:layout_marginRight="10dp"
+        android:clickable="true"
+        app:backgroundTint="@color/colorVerde"
+        android:tag="4"
+        android:visibility="invisible"
+
+        />
+
+    <!--INICIAR-->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/faIniciar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_play"
+        android:layout_gravity="end|bottom"
+        android:layout_above="@+id/faFinalizar"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="15dp"
+        android:clickable="true"
+        app:backgroundTint="@color/colorAzul3"
+        android:layout_marginRight="10dp"
+        android:tag="2"
+        android:visibility="invisible"
+
+        />
+
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         android:name="com.google.android.gms.maps.MapFragment"
         android:id="@+id/ContenedorMapa"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         tools:layout_editor_absoluteY="16dp"
-        tools:layout_editor_absoluteX="8dp" />
+        tools:layout_editor_absoluteX="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
 
 
     <LinearLayout

@@ -9,4 +9,21 @@
 
     <color name="colorBotonNormal">#37474F</color>
     <color name="colorBotonPush">#607D8B</color>
+
+    <color name="colorAzul">#4887F2</color>
+    <color name="colorAzul1">#01579B</color>
+    <color name="colorNar">#F57C00</color>
+    <color name="colorNar1">#E65100</color>
+    <color name="colorAmarilo">#FFC400</color>
+    <color name="colorAmarilo1">#FFAB00</color>
+    <color name="colorVerde">#2E7D32</color>
+    <color name="colorVerde1">#1B5E20</color>
+    <color name="colorRosa">#004D40</color>
+
+    <color name="colorRojo">#D50000</color>
+    <color name="colorAzul2">#2196F3</color>
+    <color name="colorAzul3">#2962FF</color>
+    <color name="colorRojo1">#880E4F</color>
+
+
 </resources>

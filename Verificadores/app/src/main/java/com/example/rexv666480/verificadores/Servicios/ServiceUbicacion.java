@@ -70,7 +70,7 @@ public class ServiceUbicacion extends Service
                     LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
                     mLocationListeners[1]);
         } catch (java.lang.SecurityException ex) {
-            Log.i(TAG, "fail to request location update, ignore", ex);
+            Log.d(TAG, "fail to request location update, ignore", ex);
         } catch (IllegalArgumentException ex) {
             Log.d(TAG, "network provider does not exist, " + ex.getMessage());
         }
@@ -79,7 +79,7 @@ public class ServiceUbicacion extends Service
                     LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
                     mLocationListeners[0]);
         } catch (java.lang.SecurityException ex) {
-            Log.i(TAG, "fail to request location update, ignore", ex);
+            Log.d(TAG, "fail to request location update, ignore", ex);
         } catch (IllegalArgumentException ex) {
             Log.d(TAG, "gps provider does not exist " + ex.getMessage());
         }
@@ -121,7 +121,6 @@ public class ServiceUbicacion extends Service
     private class LocationListener implements android.location.LocationListener
     {
         Location mLastLocation;
-
         public LocationListener(String provider)
         {
             Log.e(TAG, "LocationListener " + provider);
@@ -132,6 +131,7 @@ public class ServiceUbicacion extends Service
         public void onLocationChanged(Location location)
         {
             try {
+
                 Log.e(TAG, "onLocationChanged: " + location);
                 mLastLocation.set(location);
                 ServiciosWeb sw = retrofitClient.getRetrofit().create(ServiciosWeb.class);
@@ -162,20 +162,6 @@ public class ServiceUbicacion extends Service
             {
                 Log.d(TAG, ex.getMessage());
             }
-            /* UNA MANERA DIFERENTE DE REALIZAR UNA LLAMADA A UN WEB SERVICE CON RETROFIT
-            Call<Respuesta> res = sw.enviarUbicacionActual(new Verificador());
-            res.enqueue(new Callback<Respuesta>() {
-                @Override
-                public void onResponse(Call<Respuesta> call, Response<Respuesta> response) {
-
-                }
-
-                @Override
-                public void onFailure(Call<Respuesta> call, Throwable t) {
-
-                }
-            });
-            */
         }
 
         @Override
