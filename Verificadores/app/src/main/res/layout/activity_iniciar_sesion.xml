@@ -31,7 +31,6 @@
                 android:src="@drawable/logo" />
         </LinearLayout>
 
-
         <LinearLayout
             android:id="@+id/area_nombre"
             android:layout_width="match_parent"

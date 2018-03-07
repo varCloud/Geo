@@ -76,14 +76,14 @@ public class ServiceFCMPush extends FirebaseMessagingService {
 
     private void handleDataMessage(JSONObject json) {
         Log.e(TAG, "push json: " + json.toString());
-
+        int notifyID  = 1410;
         try {
 
             JSONObject data = json.getJSONObject("data");
             String title = data.getString("titulo");
             String message = data.getString("mensaje");
             String tipoNotificacion = data.getString("tipoNotificacion");
-
+            notifyID += Integer.parseInt(tipoNotificacion);
             SonidoNotificacion();
             NotificationCompat.Builder notificationBuilder = new
                     NotificationCompat.Builder(this)
@@ -91,6 +91,10 @@ public class ServiceFCMPush extends FirebaseMessagingService {
                     .setContentTitle(title)
                     .setContentText(message)
                     .setAutoCancel(true);
+            if(tipoNotificacion.equals("3"))
+            {
+                notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(message));
+            }
             if(tipoNotificacion.equals("2")) {
 
                 Intent intent = new Intent(this, VisitasActivity.class);
@@ -99,10 +103,11 @@ public class ServiceFCMPush extends FirebaseMessagingService {
                 PendingIntent pendingIntent = PendingIntent.getActivity(this, 1410, intent, PendingIntent.FLAG_ONE_SHOT);
                 notificationBuilder.setContentIntent(pendingIntent);
                 notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
+
             }
             notificationBuilder.setDefaults(Notification.DEFAULT_ALL);
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(1410, notificationBuilder.build());
+            notificationManager.notify(notifyID, notificationBuilder.build());
 
         } catch (JSONException e) {
             Log.e(TAG, "Json Exception: " + e.getMessage());
@@ -126,7 +131,7 @@ public class ServiceFCMPush extends FirebaseMessagingService {
     public void SonidoNotificacion()
     {
         try {
-            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
             Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
             r.play();
         } catch (Exception e) {

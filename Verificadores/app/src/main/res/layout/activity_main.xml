@@ -91,6 +91,7 @@
         android:tag="2"
         android:visibility="invisible"
 
+
         />
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
@@ -112,6 +113,7 @@
         android:layout_alignParentTop="true">
 
         <Button
+            android:visibility="invisible"
             android:id="@+id/btnIniciarNevegacion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -123,6 +125,7 @@
             />
 
         <Button
+            android:visibility="invisible"
             android:id="@+id/btnFinalizarVisita"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -132,6 +135,7 @@
             android:layout_weight="1"/>
 
         <Button
+            android:visibility="invisible"
             android:id="@+id/btnCancelarnavegacion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -150,6 +154,7 @@
         android:layout_alignParentBottom="true"
         >
         <Button
+            android:visibility="invisible"
             android:id="@+id/btnComollegar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

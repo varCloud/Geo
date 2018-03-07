@@ -3,6 +3,7 @@ package com.example.rexv666480.verificadores;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.location.Location;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
@@ -37,6 +38,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -55,7 +57,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity  implements  View.OnClickListener ,OnMapReadyCallback ,GoogleMap.OnMarkerClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     @BindView(R.id.faComollegar)
     FloatingActionButton faComollegar;
     @BindView(R.id.faCanecelar)
@@ -77,20 +79,19 @@ public class MainActivity extends AppCompatActivity  implements  View.OnClickLis
 //    FloatingActionMenu menuYellow;
 
     private static final int ACCESS_FINE_LOCATION = 102;
-    private static final String TAG ="Actividad MAIN";
-    private AgenteServicioUbicacion agenteServicioUbicacion=null;
+    private static final String TAG = "Actividad MAIN";
+    private AgenteServicioUbicacion agenteServicioUbicacion = null;
     private Visita visita;
     private Verificador verificador;
-    ArrayList markerPoints= new ArrayList();
-    Button btnIniciarNavegacion , btnComollegar ,  btnCancelar,btnFinalizar;
+    ArrayList markerPoints = new ArrayList();
+
     private GoogleMap mMap;
     Loading loading;
     Activity activity;
     UbicacionActual ubicacionActual;
-    NotificacionToast notificacionToast=null;
-    private Animation fab_open,fab_close,rotate_forward,rotate_backward;
+    NotificacionToast notificacionToast = null;
+    private Animation fab_open, fab_close, rotate_forward, rotate_backward;
     private Boolean isFabOpen = false;
-
 
 
     @Override
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity  implements  View.OnClickLis
             MapFragment mapFragment = (MapFragment) getFragmentManager()
                     .findFragmentById(R.id.ContenedorMapa);
             mapFragment.getMapAsync(this);
+
             /*  --------------------------ANIMACIONES ------------------------------------------*/
                 fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
                 fab_close = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
@@ -116,28 +118,22 @@ public class MainActivity extends AppCompatActivity  implements  View.OnClickLis
             faCanecelar.setOnClickListener(this);
             /*--------------------------------------------------------------------------------------------*/
             loading = new Loading(this);
-            btnIniciarNavegacion = (Button) findViewById(R.id.btnIniciarNevegacion);
-            btnComollegar = (Button) findViewById(R.id.btnComollegar);
-            btnCancelar = (Button) findViewById(R.id.btnCancelarnavegacion);
-            btnFinalizar = (Button) findViewById(R.id.btnFinalizarVisita);
             this.activity = this;
             Intent i = getIntent();
             visita = new Gson().fromJson(i.getStringExtra("paramVisita"), Visita.class);
             verificador = new Gson().fromJson(i.getStringExtra("paramVerificador"), Verificador.class);
             ubicacionActual = new UbicacionActual();
-            initClicksBotones();
             agenteServicioUbicacion = new AgenteServicioUbicacion(this);
             notificacionToast= new NotificacionToast(getApplicationContext());
 
             if(visita.getIdEstatusVisita().toString().equals("2")) {
                 verificador.setidVisita(visita.getIdVisita());
                 agenteServicioUbicacion.IniciarServicio(verificador);
-                btnIniciarNavegacion.setText("PAUSAR");
-                btnIniciarNavegacion.setTag("3");
+                faIniciar.setTag("3");
+                faIniciar.setImageResource(R.mipmap.ic_stop);
             }
-        }catch(Exception ex)
-        {
-            throw  ex;
+        } catch (Exception ex) {
+            throw ex;
         }
 
 
@@ -148,12 +144,21 @@ public class MainActivity extends AppCompatActivity  implements  View.OnClickLis
     public void onClick(View v) {
         int id = v.getId();
         String tag = "";
-        switch (id){
+        switch (id) {
             case R.id.faMenu:
                 animateFAB();
                 break;
             case R.id.faIniciar:
                 tag = v.getTag().toString();
+                if (tag.equals("2")) {
+                    faIniciar.setTag("3");
+                    faIniciar.setImageResource(R.mipmap.ic_stop);
+                    faIniciar.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAmarilo1)));
+                } else {
+                    faIniciar.setTag("2");
+                    faIniciar.setImageResource(R.mipmap.ic_play);
+                    faIniciar.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAzul3)));
+                }
                 ActualizarVisita(tag);
                 break;
             case R.id.faCanecelar:
@@ -162,11 +167,10 @@ public class MainActivity extends AppCompatActivity  implements  View.OnClickLis
                 break;
             case R.id.faComollegar:
             case R.id.btnComollegar:
-                if (ContextCompat.checkSelfPermission(getApplication(),android.Manifest.permission.ACCESS_FINE_LOCATION)
+                if (ContextCompat.checkSelfPermission(getApplication(), android.Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
                     Comollegar();
-                }else
-                {
+                } else {
                     ActivityCompat.requestPermissions(activity,
                             new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                             ACCESS_FINE_LOCATION);
@@ -179,132 +183,81 @@ public class MainActivity extends AppCompatActivity  implements  View.OnClickLis
         }
     }
 
-    public void initClicksBotones()
-    {
-        try{
-                btnComollegar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (ContextCompat.checkSelfPermission(getApplication(),android.Manifest.permission.ACCESS_FINE_LOCATION)
-                            == PackageManager.PERMISSION_GRANTED) {
-                            Comollegar();
-                    }else
-                    {
-                        ActivityCompat.requestPermissions(activity,
-                                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                                ACCESS_FINE_LOCATION);
-                    }
-                }
-            });
-
-            btnIniciarNavegacion.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(btnIniciarNavegacion.getTag().equals("2"))
-                    {
-                        btnIniciarNavegacion.setTag("3");
-                        btnIniciarNavegacion.setText("PAUSAR");
-                    }else
-                    {
-                        btnIniciarNavegacion.setTag("2");
-                        btnIniciarNavegacion.setText("INICIAR");
-                    }
-                    ActualizarVisita(btnIniciarNavegacion.getTag().toString());
-                }
-            });
-
-            btnCancelar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ActualizarVisita("5");
-                }
-            });
-
-            btnFinalizar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ActualizarVisita("4");
-                }
-            });
-
-        }catch (Exception ex)
-        {
-            Log.d(TAG,ex.getMessage());
-        }
-    }
-
 
     @Override
     public void onMapReady(final GoogleMap mMapa) {
         try {
-            loading.ShowLoading("Cargando...");
+            final LatLng latitudMorelia = new LatLng(19.708812, -101.198874);
             mMap = mMapa;
-            final LatLng latitudMorelia = new LatLng(19.1666700, -101.8333300);
-            float zoomLevel = 21.0f; //This goes up to 21
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latitudMorelia, zoomLevel));
-
-
-            if (markerPoints.size() > 1) {
-                markerPoints.clear();
-                mMap.clear();
-            }
-
-            // Adding new item to the ArrayList
-            ubicacionActual.getLocation(this.activity);
-           // AgregarMarker(ubicacionActual.ObtenerLatLng());
-            AgregarMarker(visita.getOrigen(),visita.getDescripcionOrigen());
-            AgregarMarker(visita.getDestino(),visita.getDescripcionDestino());
-
-            // Checks, whether start and end locations are captured
-            if (markerPoints.size() >= 2) {
-                final LatLng origin = (LatLng) markerPoints.get(0);
-                final LatLng dest = (LatLng) markerPoints.get(1);
-
-                // Getting URL to the Google Directions API
-                LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
-                builder.include(origin);
-                builder.include(dest);
-                LatLngBounds bounds = builder.build();
-                int width = getResources().getDisplayMetrics().widthPixels;
-                int height = getResources().getDisplayMetrics().heightPixels;
-                int padding = (int) (width * 0.12);
-                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
-
-                mMap.moveCamera(cu);
-                //mMap.animateCamera(cu);
-                mMap.moveCamera(CameraUpdateFactory.zoomTo(14.5F));
-                loading.CerrarLoading();
-                //String url = getDirectionsUrl(origin, dest);
-                DownloadTask downloadTask = new DownloadTask(new AsyncResponse() {
-                    @Override
-                    public void processFinish(PolylineOptions output) {
-                        try {
-                            loading.CerrarLoading();
-                            if(output != null) {
-                                mMap.addPolyline(output);
-                                LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                                builder.include(origin);
-                                builder.include(dest);
-                                LatLngBounds bounds = builder.build();
-                                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 100);
-                                mMap.animateCamera(cu);
-                            }else
-                                Toast("Las lineas del mapa son null");
-                            //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom((LatLng) markerPoints.get(0), 10F));
-                        } catch (Exception ex) {
-                            Log.d("error verificador", ex.getMessage());
-                        }
+            CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+                    latitudMorelia, 5);
+            mMap.animateCamera(location);
+            /* ----------------CUANDO SE TERMINA DE CARGAR EL MAPA  SE EJECUTA ESTE EVENTO---------------*/
+            mMapa.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                @Override
+                public void onMapLoaded() {
+                    if (markerPoints.size() > 1) {
+                        markerPoints.clear();
+                        mMap.clear();
                     }
-                });
-                // se consume el web service de  Google Directions API hasta 2500 peticiones diarias
 
-               // downloadTask.execute(url); para pintar la ruta
-            }
-        }catch (Exception ex)
-        {
+                    // Adding new item to the ArrayList
+                    ubicacionActual.getLocation(activity);
+                    // AgregarMarker(ubicacionActual.ObtenerLatLng());
+                    AgregarMarker(visita.getOrigen(), visita.getDescripcionOrigen());
+                    AgregarMarker(visita.getDestino(), visita.getDescripcionDestino());
+
+                    // Checks, whether start and end locations are captured
+                    if (markerPoints.size() >= 2) {
+                        final LatLng origin = (LatLng) markerPoints.get(0);
+                        final LatLng dest = (LatLng) markerPoints.get(1);
+
+                        // Getting URL to the Google Directions API
+                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+                        builder.include(origin);
+                        builder.include(dest);
+                        LatLngBounds bounds = builder.build();
+                        int width = getResources().getDisplayMetrics().widthPixels;
+                        int height = getResources().getDisplayMetrics().heightPixels;
+                        int padding = (int) (width * 0.12);
+                        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+                        mMap.animateCamera(cu, 4000 , null);
+                        loading.CerrarLoading();
+
+                        //String url = getDirectionsUrl(origin, dest);
+                        DownloadTask downloadTask = new DownloadTask(new AsyncResponse() {
+                            @Override
+                            public void processFinish(PolylineOptions output) {
+                                try {
+                                    loading.CerrarLoading();
+                                    if (output != null) {
+                                        mMap.addPolyline(output);
+                                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                        builder.include(origin);
+                                        builder.include(dest);
+                                        LatLngBounds bounds = builder.build();
+                                        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 100);
+                                        mMap.animateCamera(cu);
+                                    } else
+                                        notificacionToast.Show("Las lineas del mapa son null");
+                                    //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom((LatLng) markerPoints.get(0), 10F));
+                                } catch (Exception ex) {
+                                    Log.d("error verificador", ex.getMessage());
+                                }
+                            }
+                        });
+
+                    }
+                }
+            });
+
+            // se consume el web service de  Google Directions API hasta 2500 peticiones diarias
+            // downloadTask.execute(url); para pintar la ruta
+
+        } catch (Exception ex) {
             loading.CerrarLoading();
-           notificacionToast.Show(ex.getMessage());
+            notificacionToast.Show(ex.getMessage());
         }
 
     }
@@ -328,19 +281,18 @@ public class MainActivity extends AppCompatActivity  implements  View.OnClickLis
         return false;
     }
 
-    private void AgregarMarker(LatLng latLng, String descripcion)
-    {
+    private void AgregarMarker(LatLng latLng, String descripcion) {
         markerPoints.add(latLng);
         MarkerOptions options = new MarkerOptions();
         options.position(latLng);
 
         if (markerPoints.size() == 1) {
             options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            options.title("Origen: "+descripcion);
+            options.title("Origen: " + descripcion);
 
         } else if (markerPoints.size() == 2) {
             options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-            options.title("Destino: "+descripcion);
+            options.title("Destino: " + descripcion);
 
         }
 
@@ -366,7 +318,7 @@ public class MainActivity extends AppCompatActivity  implements  View.OnClickLis
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
 
             case ACCESS_FINE_LOCATION: {
@@ -382,8 +334,7 @@ public class MainActivity extends AppCompatActivity  implements  View.OnClickLis
         }
     }
 
-    public  void Comollegar()
-    {
+    public void Comollegar() {
         try {
 
             ubicacionActual.getLocation(activity);
@@ -393,38 +344,32 @@ public class MainActivity extends AppCompatActivity  implements  View.OnClickLis
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
 
-        }catch (Exception ex)
-        {
-            Toast(ex.getMessage());
-            Log.d(TAG,ex.getMessage());
+        } catch (Exception ex) {
+             notificacionToast.Show(ex.getMessage());
+            Log.d(TAG, ex.getMessage());
         }
     }
 
-    public void ActualizarVisita(final String estatus)
-    {
-        try
-        {
+    public void ActualizarVisita(final String estatus) {
+        try {
             loading.ShowLoading("Actulizando estatus de la visita");
-            Map<String,String> map =  new HashMap<String,String>();
-            map.put("idEstatusVisita",estatus);
-            map.put("idVisita",visita.getIdVisita()+"");
-            RetrofitClient retrofitClient  = new RetrofitClient();
-            ServiciosWeb sw =  retrofitClient.getRetrofit().create(ServiciosWeb.class);
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idEstatusVisita", estatus);
+            map.put("idVisita", visita.getIdVisita() + "");
+            RetrofitClient retrofitClient = new RetrofitClient();
+            ServiciosWeb sw = retrofitClient.getRetrofit().create(ServiciosWeb.class);
             sw.ActualizarEstatusVisitas(map).enqueue(new Callback<Map<String, String>>() {
                 @Override
                 public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
-                    if(response.code() ==200) {
-                        Map<String,String> map = response.body();
-                        if(map.get("estatus").toString().equals("500"))
-                        {
-                            Toast("Ocurrio un error al actulizar la visita "+map.get("msj"));
-                        }else
-                        {
-                            if(estatus.equals("2") || estatus.equals("3") ) {
+                    if (response.code() == 200) {
+                        Map<String, String> map = response.body();
+                        if (map.get("estatus").toString().equals("500")) {
+                            notificacionToast.Show("Ocurrio un error al actulizar la visita: " + map.get("msj"));
+                        } else {
+                            if (estatus.equals("2") || estatus.equals("3")) {
                                 verificador.setidVisita(visita.getIdVisita());
                                 agenteServicioUbicacion.IniciarServicio(verificador);
-                            }else
-                            {
+                            } else {
                                 finish();
                             }
                         }
@@ -435,61 +380,56 @@ public class MainActivity extends AppCompatActivity  implements  View.OnClickLis
                 @Override
                 public void onFailure(Call<Map<String, String>> call, Throwable t) {
                     loading.CerrarLoading();
-                    Toast(t.getMessage());
+                    notificacionToast.Show("Espere un momento y vuelva a intentarlo");
                 }
 
             });
 
-        }catch (Exception ex)
-        {
-            Toast(ex.getMessage());
+        } catch (Exception ex) {
+            notificacionToast.Show("Espere un momento y vualva a intentarlo");
         }
 
     }
 
-    public void Toast(String mensaje)
-    {
-        Toast.makeText(this,mensaje,Toast.LENGTH_SHORT).show();
-    }
 
-    public void animateFAB(){
+    public void animateFAB() {
 
-        try{
+        try {
 
-        if(isFabOpen){
+            if (isFabOpen) {
 
-            faMenu.startAnimation(rotate_backward);
-            faComollegar.startAnimation(fab_close);
-            faIniciar.startAnimation(fab_close);
-            faFinalizar.startAnimation(fab_close);
-            faCanecelar.startAnimation(fab_close);
+                faMenu.startAnimation(rotate_backward);
+                faComollegar.startAnimation(fab_close);
+                faIniciar.startAnimation(fab_close);
+                faFinalizar.startAnimation(fab_close);
+                faCanecelar.startAnimation(fab_close);
 
-            faCanecelar.setClickable(false);
-            faFinalizar.setClickable(false);
-            faCanecelar.setClickable(false);
-            faFinalizar.setClickable(false);
-            isFabOpen = false;
-            Log.d("Raj", "close");
-            faMenu.setImageResource(R.mipmap.ic_menu);
+                faCanecelar.setClickable(false);
+                faFinalizar.setClickable(false);
+                faCanecelar.setClickable(false);
+                faFinalizar.setClickable(false);
+                isFabOpen = false;
 
-        } else {
-            faMenu.startAnimation(rotate_forward);
-            faComollegar.startAnimation(fab_open);
-            faIniciar.startAnimation(fab_open);
-            faFinalizar.startAnimation(scale_up);
-            faCanecelar.startAnimation(scale_up);
-            faComollegar.setClickable(true);
-            faIniciar.setClickable(true);
-            faFinalizar.setClickable(true);
-            faCanecelar.setClickable(true);
-            isFabOpen = true;
-            faMenu.setImageResource(R.mipmap.ic_close);
-            Log.d("Raj","open");
+                faMenu.setImageResource(R.mipmap.ic_menu);
 
-        }
-        }catch (Exception ex)
-        {
-            throw  ex;
+            } else {
+                faMenu.startAnimation(rotate_forward);
+                faComollegar.startAnimation(fab_open);
+                faIniciar.startAnimation(fab_open);
+                faFinalizar.startAnimation(fab_open);
+                faCanecelar.startAnimation(fab_open);
+
+                faComollegar.setClickable(true);
+                faIniciar.setClickable(true);
+                faFinalizar.setClickable(true);
+                faCanecelar.setClickable(true);
+                isFabOpen = true;
+                faMenu.setImageResource(R.mipmap.ic_close);
+
+
+            }
+        } catch (Exception ex) {
+            throw ex;
         }
     }
 
