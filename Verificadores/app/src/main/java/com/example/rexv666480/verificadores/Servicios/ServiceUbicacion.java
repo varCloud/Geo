@@ -19,6 +19,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.safetynet.SafetyNetApi;
 import com.google.gson.Gson;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -127,12 +131,18 @@ public class ServiceUbicacion extends Service
             mLastLocation = new Location(provider);
         }
 
+        private String getDateTime() {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            Date date = new Date();
+            return dateFormat.format(date);
+        }
+
         @Override
         public void onLocationChanged(Location location)
         {
             try {
 
-                Log.e(TAG, "onLocationChanged: " + location);
+                Log.e(TAG, "onLocationChanged: "+getDateTime()+" " + location);
                 mLastLocation.set(location);
                 ServiciosWeb sw = retrofitClient.getRetrofit().create(ServiciosWeb.class);
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -146,7 +156,7 @@ public class ServiceUbicacion extends Service
                             if (resp.getEstatus().toString().equals("1"))
                                 Log.d(TAG, "actualizacion correcta");
                         } else
-                            Log.d(TAG, "Web servoce no responde con los parametros acutuales");
+                            Log.d(TAG, "Web service no responde con los parametros acutuales");
                     }
 
                     @Override

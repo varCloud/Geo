@@ -14,8 +14,9 @@
         android:roundIcon="@mipmap/logo_cir"
         android:supportsRtl="true"
         android:screenOrientation="portrait"
-        android:theme="@style/FullScreen">
+        android:theme="@style/AppTheme">
         <activity android:name=".MainActivity"
+            android:theme="@style/FullScreen"
            ></activity>
 
         <meta-data
@@ -27,12 +28,14 @@
 
         <activity android:name=".VisitasActivity"
             android:label="Visitas Actuales"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            >
 
         </activity>
         <activity android:name=".IniciarSesionActivity"
                   android:label="App-GEO"
             android:theme="@style/FullScreen"
+
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"

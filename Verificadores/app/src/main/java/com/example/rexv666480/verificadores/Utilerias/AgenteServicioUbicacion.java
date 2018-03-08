@@ -37,7 +37,7 @@ public class AgenteServicioUbicacion {
     {
         try {
 
-                DetenerServicio();
+                //DetenerServicio();
                 Intent intentServicio = new Intent(activity, ServiceUbicacion.class);
                 intentServicio.putExtra("paramVerificador", new Gson().toJson(verificador));
                 activity.startService(intentServicio);
