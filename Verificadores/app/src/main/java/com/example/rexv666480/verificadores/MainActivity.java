@@ -297,6 +297,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         mMap.addMarker(options).setTag(0);
+        mMap.addMarker(options).showInfoWindow();
         mMap.setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) this);
     }
 
