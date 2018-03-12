@@ -6,17 +6,16 @@
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/logo_cir"
-        android:supportsRtl="true"
         android:screenOrientation="portrait"
+        android:supportsRtl="true"
         android:theme="@style/FullScreen">
-        <activity android:name=".MainActivity"
-           ></activity>
+        <activity android:name=".MainActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -25,24 +24,25 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".VisitasActivity"
+        <activity
+            android:name=".VisitasActivity"
             android:label="Visitas Actuales"
-            android:screenOrientation="portrait" >
-
-        </activity>
-        <activity android:name=".IniciarSesionActivity"
-                  android:label="App-GEO"
-            android:theme="@style/FullScreen"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".IniciarSesionActivity"
+            android:label="App-GEO"
+            android:screenOrientation="portrait"
+            android:theme="@style/FullScreen">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"
-                        android:screenOrientation="portrait" />
+                <action
+                    android:name="android.intent.action.MAIN"
+                    android:screenOrientation="portrait" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <service android:name=".Servicios.ServiceUbicacion" />
-
         <service android:name=".Servicios.ServiceFCMPush">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -54,7 +54,14 @@
             </intent-filter>
         </service>
 
-
+        <receiver
+            android:name=".UbicacionReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" > </action>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

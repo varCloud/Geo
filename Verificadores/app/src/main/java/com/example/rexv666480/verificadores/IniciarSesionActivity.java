@@ -30,6 +30,7 @@ public class IniciarSesionActivity extends AppCompatActivity {
     Button btnIniciar= null;
     EditText etUsuario,etContra = null;
     Context context;
+    SharedPreferences settings;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +48,7 @@ public class IniciarSesionActivity extends AppCompatActivity {
                 Verificador veri = new Verificador();
                 veri.setContrasena(etContra.getText().toString());
                 veri.setUsuario(etUsuario.getText().toString());
-                SharedPreferences settings = getSharedPreferences("MisPreferencias",context.getApplicationContext().MODE_PRIVATE);
+                settings = getSharedPreferences("MisPreferencias",context.getApplicationContext().MODE_PRIVATE);
                 String token = settings.getString("token","");
                 veri.setToken(token);
                 veri.setToken(FirebaseInstanceId.getInstance().getToken());
@@ -65,6 +66,7 @@ public class IniciarSesionActivity extends AppCompatActivity {
                                         Verificador verificador = respSesion.getVerificador();
                                         Intent intentRutas = new Intent(IniciarSesionActivity.this, VisitasActivity.class);
                                         intentRutas.putExtra("paramVerificador", new Gson().toJson(verificador));
+                                        GuardarPreferences(verificador);
                                         startActivity(intentRutas);
                                         finish();
                                     }
@@ -91,6 +93,18 @@ public class IniciarSesionActivity extends AppCompatActivity {
     {
         try {
             Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
+        }catch (Exception ex)
+        {
+            Log.d(TAG,ex.getMessage());
+        }
+    }
+
+    public void GuardarPreferences(Verificador verificador)
+    {
+        try{
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString("paramVerificador", new Gson().toJson(verificador));
+            editor.commit();
         }catch (Exception ex)
         {
             Log.d(TAG,ex.getMessage());

@@ -52,6 +52,10 @@ public class ServiceUbicacion extends Service
             Log.e(TAG, "onStartCommand");
             super.onStartCommand(intent, flags, startId);
             verificador = new Gson().fromJson(intent.getStringExtra("paramVerificador"), Verificador.class);
+            if(verificador == null)
+            {
+                verificador = new Verificador();
+            }
 
         }catch (Exception ex)
         {
@@ -141,8 +145,10 @@ public class ServiceUbicacion extends Service
                     @Override
                     public void onResponse(Call<RespEstatus> call, Response<RespEstatus> response) {
                         if (response.code() == 200) {
+                            //response.raw().request().
+                            //Log.d("reques:",  call.request().body().);
                             RespEstatus resp = response.body();
-                            Log.d(TAG, resp.getEstatus());
+                            Log.d("ServicioRespWS:", resp.getEstatus());
                             if (resp.getEstatus().toString().equals("1"))
                                 Log.d(TAG, "actualizacion correcta");
                         } else
