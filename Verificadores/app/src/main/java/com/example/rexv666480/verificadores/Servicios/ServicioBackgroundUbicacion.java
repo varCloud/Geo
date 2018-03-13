@@ -10,14 +10,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.example.rexv666480.verificadores.Entidades.Respuesta;
 import com.example.rexv666480.verificadores.Entidades.Ubicacion;
 import com.example.rexv666480.verificadores.Entidades.Verificador;
 import com.example.rexv666480.verificadores.ServiciosWeb.Respuestas.RespEstatus;
 import com.example.rexv666480.verificadores.ServiciosWeb.RetrofitClient;
 import com.example.rexv666480.verificadores.ServiciosWeb.ServiciosWeb;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.safetynet.SafetyNetApi;
 import com.google.gson.Gson;
 
 import java.text.DateFormat;
@@ -29,30 +27,28 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Created by rexv666480 on 14/12/2017.
+ * Created by victor on 12/03/18.
  */
 
-public class ServiceUbicacion extends Service
-{
-    private static final String TAG = "ServicioUbicacion";
+public class ServicioBackgroundUbicacion extends Service {
+    private static final String TAG = "ServiceBackground";
     private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 5000 ; // seis segundos
+    private static final int LOCATION_INTERVAL = 5000; // seis segundos
     private static final float LOCATION_DISTANCE = 0f; // 10 metros
-    private RetrofitClient retrofitClient=null;
+    private RetrofitClient retrofitClient = null;
     private Verificador verificador;
-    LocationListener[] mLocationListeners = new LocationListener[] {
-            new LocationListener(LocationManager.GPS_PROVIDER),
-            new LocationListener(LocationManager.NETWORK_PROVIDER)
+    ServicioBackgroundUbicacion.LocationListenerBack[] mLocationListeners = new ServicioBackgroundUbicacion.LocationListenerBack[]{
+            new ServicioBackgroundUbicacion.LocationListenerBack(LocationManager.GPS_PROVIDER),
+            new ServicioBackgroundUbicacion.LocationListenerBack(LocationManager.NETWORK_PROVIDER)
     };
+
     @Override
-    public IBinder onBind(Intent arg0)
-    {
+    public IBinder onBind(Intent arg0) {
         return null;
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId)
-    {
+    public int onStartCommand(Intent intent, int flags, int startId) {
         try {
             Log.e(TAG, "onStartCommand");
             super.onStartCommand(intent, flags, startId);
@@ -65,16 +61,14 @@ public class ServiceUbicacion extends Service
                 verificador = new Gson().fromJson(x, Verificador.class);
             }
 
-        }catch (Exception ex)
-        {
-            Log.d(TAG,ex.getMessage());
+        } catch (Exception ex) {
+            Log.d(TAG, ex.getMessage());
         }
         return START_STICKY;
     }
 
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
 
         initializeLocationManager();
         try {
@@ -98,8 +92,7 @@ public class ServiceUbicacion extends Service
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         Log.e(TAG, "onDestroy");
         super.onDestroy();
         if (mLocationManager != null) {
@@ -114,7 +107,7 @@ public class ServiceUbicacion extends Service
     }
 
     private void initializeLocationManager() {
-        try{
+        try {
             Log.e(TAG, "initializeLocationManager");
             if (mLocationManager == null) {
                 mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
@@ -123,18 +116,16 @@ public class ServiceUbicacion extends Service
             if (retrofitClient == null) {
                 retrofitClient = new RetrofitClient();
             }
-        }catch (Exception ex)
-        {
+        } catch (Exception ex) {
             Log.d(TAG, ex.getMessage());
         }
 
     }
 
-    private class LocationListener implements android.location.LocationListener
-    {
+    private class LocationListenerBack implements android.location.LocationListener {
         Location mLastLocation;
-        public LocationListener(String provider)
-        {
+
+        public LocationListenerBack(String provider) {
             Log.e(TAG, "LocationListener " + provider);
             mLastLocation = new Location(provider);
         }
@@ -146,11 +137,10 @@ public class ServiceUbicacion extends Service
         }
 
         @Override
-        public void onLocationChanged(Location location)
-        {
+        public void onLocationChanged(Location location) {
             try {
 
-                Log.e(TAG, "onLocationChanged: "+getDateTime()+" " + location);
+                Log.e(TAG, "onLocationChanged: " + getDateTime() + " " + location);
                 mLastLocation.set(location);
                 ServiciosWeb sw = retrofitClient.getRetrofit().create(ServiciosWeb.class);
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -159,8 +149,6 @@ public class ServiceUbicacion extends Service
                     @Override
                     public void onResponse(Call<RespEstatus> call, Response<RespEstatus> response) {
                         if (response.code() == 200) {
-                            //response.raw().request().
-                            //Log.d("reques:",  call.request().body().);
                             RespEstatus resp = response.body();
                             Log.d("ServicioRespWS:", resp.getEstatus());
                             if (resp.getEstatus().toString().equals("1"))
@@ -172,35 +160,32 @@ public class ServiceUbicacion extends Service
                     @Override
                     public void onFailure(Call<RespEstatus> call, Throwable t) {
                         try {
-                            throw  t;
+                            throw t;
                         } catch (Throwable throwable) {
                             throwable.printStackTrace();
                         }
                     }
                 });
-            }catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Log.d(TAG, ex.getMessage());
             }
         }
 
         @Override
-        public void onProviderDisabled(String provider)
-        {
+        public void onProviderDisabled(String provider) {
             Log.e(TAG, "onProviderDisabled: " + provider);
         }
 
         @Override
-        public void onProviderEnabled(String provider)
-        {
+        public void onProviderEnabled(String provider) {
             Log.e(TAG, "onProviderEnabled: " + provider);
         }
 
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras)
-        {
+        public void onStatusChanged(String provider, int status, Bundle extras) {
             Log.e(TAG, "onStatusChanged: " + provider);
         }
     }
-
 }
+
+

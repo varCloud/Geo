@@ -40,6 +40,7 @@ public class IniciarSesionActivity extends AppCompatActivity {
         etUsuario = (EditText) findViewById(R.id.etUsuario);
         this.context = this;
         loading = new Loading(this.context);
+        settings = getSharedPreferences("MisPreferencias",context.getApplicationContext().MODE_PRIVATE);
         btnIniciar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -48,7 +49,8 @@ public class IniciarSesionActivity extends AppCompatActivity {
                 Verificador veri = new Verificador();
                 veri.setContrasena(etContra.getText().toString());
                 veri.setUsuario(etUsuario.getText().toString());
-                settings = getSharedPreferences("MisPreferencias",context.getApplicationContext().MODE_PRIVATE);
+                //String x = settings.getString("paramVerificador","");
+
                 String token = settings.getString("token","");
                 veri.setToken(token);
                 veri.setToken(FirebaseInstanceId.getInstance().getToken());

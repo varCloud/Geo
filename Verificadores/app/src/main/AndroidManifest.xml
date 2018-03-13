@@ -48,6 +48,7 @@
         </activity>
 
         <service android:name=".Servicios.ServiceUbicacion" />
+        <service android:name=".Servicios.ServicioBackgroundUbicacion" />
         <service android:name=".Servicios.ServiceFCMPush">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

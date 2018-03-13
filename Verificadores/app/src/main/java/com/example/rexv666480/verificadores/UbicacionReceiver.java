@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.rexv666480.verificadores.Servicios.ServiceUbicacion;
+import com.example.rexv666480.verificadores.Servicios.ServicioBackgroundUbicacion;
 import com.google.gson.Gson;
 
 public class UbicacionReceiver extends BroadcastReceiver {
@@ -17,12 +18,10 @@ public class UbicacionReceiver extends BroadcastReceiver {
         // TODO: This method is called when the BroadcastReceiver is receiving
         // an Intent broadcast.
         try {
-            SharedPreferences settings = context.getSharedPreferences("MisPreferencias", context.getApplicationContext().MODE_PRIVATE);
-            String verificador = settings.getString("paramVerificador", "");
-            Log.d("UbicacionReceiver",verificador);
-            Toast.makeText(context, "Servicio iniciado desde BroadcastReceiver", Toast.LENGTH_SHORT).show();
-            Intent intentUbicacion = new Intent(context, ServiceUbicacion.class);
-            intent.putExtra("paramVerificador", verificador);
+
+            Log.d("MyBootReceiver", "Boot Completed!");
+            Toast.makeText(context,"Carga del Sistema Completo",Toast.LENGTH_LONG).show();
+            Intent intentUbicacion = new Intent(context, ServicioBackgroundUbicacion.class);
             context.startService(intentUbicacion);
         }catch (Exception ex)
         {
