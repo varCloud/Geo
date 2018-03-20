@@ -48,7 +48,8 @@
         </activity>
 
         <service android:name=".Servicios.ServiceUbicacion" />
-        <service android:name=".Servicios.ServicioBackgroundUbicacion" />
+        <service android:name=".Servicios.ServicioBackgroundUbicacion"
+            android:stopWithTask="false"/>
         <service android:name=".Servicios.ServiceFCMPush">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -66,6 +67,9 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" > </action>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.example.rexv666480.verificadores.ReiniciarServicio" />
             </intent-filter>
         </receiver>
     </application>

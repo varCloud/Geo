@@ -21,6 +21,8 @@ import com.google.gson.Gson;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,15 +35,44 @@ import retrofit2.Response;
 public class ServicioBackgroundUbicacion extends Service {
     private static final String TAG = "ServiceBackground";
     private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 5000; // seis segundos
+    private static final int LOCATION_INTERVAL = 6000; // seis segundos
     private static final float LOCATION_DISTANCE = 0f; // 10 metros
     private RetrofitClient retrofitClient = null;
     private Verificador verificador;
+    private Timer mTimer;
+    private TimerTask timerTask;
+
     ServicioBackgroundUbicacion.LocationListenerBack[] mLocationListeners = new ServicioBackgroundUbicacion.LocationListenerBack[]{
             new ServicioBackgroundUbicacion.LocationListenerBack(LocationManager.GPS_PROVIDER),
             new ServicioBackgroundUbicacion.LocationListenerBack(LocationManager.NETWORK_PROVIDER)
     };
 
+    public void initializeTimerTask() {
+        timerTask = new TimerTask() {
+            public void run() {
+                Log.e(TAG, "ejecutando");
+            }
+        };
+    }
+
+    public void startTimer() {
+        //set a new Timer
+        mTimer = new Timer();
+
+        //initialize the TimerTask's job
+        initializeTimerTask();
+
+        //schedule the timer, to wake up every 1 second
+        mTimer.schedule(timerTask, 1000, 1000); //
+    }
+
+    public void stoptimertask() {
+        //stop the timer, if it's not already null
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
+        }
+    }
     @Override
     public IBinder onBind(Intent arg0) {
         return null;
@@ -52,14 +83,15 @@ public class ServicioBackgroundUbicacion extends Service {
         try {
             Log.e(TAG, "onStartCommand");
             super.onStartCommand(intent, flags, startId);
-            verificador = new Gson().fromJson(intent.getStringExtra("paramVerificador"), Verificador.class);
+            startTimer();
+            /*verificador = new Gson().fromJson(intent.getStringExtra("paramVerificador"), Verificador.class);
             if(verificador == null)
             {
                 SharedPreferences settings =  getApplicationContext().getSharedPreferences("MisPreferencias", getApplicationContext().MODE_PRIVATE);
                 String x = settings.getString("paramVerificador","");
                 Log.d(TAG, x);
                 verificador = new Gson().fromJson(x, Verificador.class);
-            }
+            }*/
 
         } catch (Exception ex) {
             Log.d(TAG, ex.getMessage());
@@ -70,7 +102,10 @@ public class ServicioBackgroundUbicacion extends Service {
     @Override
     public void onCreate() {
 
-        initializeLocationManager();
+        mTimer = new Timer();
+        mTimer.schedule(timerTask, 2000, 2 * 1000);
+
+       /* initializeLocationManager();
         try {
             mLocationManager.requestLocationUpdates(
                     LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
@@ -89,12 +124,18 @@ public class ServicioBackgroundUbicacion extends Service {
         } catch (IllegalArgumentException ex) {
             Log.d(TAG, "gps provider does not exist " + ex.getMessage());
         }
+        */
     }
 
     @Override
     public void onDestroy() {
-        Log.e(TAG, "onDestroy");
+
         super.onDestroy();
+        Log.e(TAG, "onDestroy");
+        Log.e(TAG,"Evento de destruir");
+        Intent intent = new Intent("com.example.rexv666480.verificadores.ReiniciarServicio");
+        sendBroadcast(intent);
+        stoptimertask();
         if (mLocationManager != null) {
             for (int i = 0; i < mLocationListeners.length; i++) {
                 try {
@@ -104,6 +145,7 @@ public class ServicioBackgroundUbicacion extends Service {
                 }
             }
         }
+
     }
 
     private void initializeLocationManager() {
