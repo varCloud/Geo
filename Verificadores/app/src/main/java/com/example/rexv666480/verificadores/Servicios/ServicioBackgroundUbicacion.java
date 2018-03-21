@@ -41,16 +41,54 @@ public class ServicioBackgroundUbicacion extends Service {
     private Verificador verificador;
     private Timer mTimer;
     private TimerTask timerTask;
-
+    private Location locationWS;
+    private boolean puedoActualizar  = true;
     ServicioBackgroundUbicacion.LocationListenerBack[] mLocationListeners = new ServicioBackgroundUbicacion.LocationListenerBack[]{
             new ServicioBackgroundUbicacion.LocationListenerBack(LocationManager.GPS_PROVIDER),
             new ServicioBackgroundUbicacion.LocationListenerBack(LocationManager.NETWORK_PROVIDER)
     };
 
+
     public void initializeTimerTask() {
         timerTask = new TimerTask() {
             public void run() {
                 Log.e(TAG, "ejecutando");
+                try {
+
+                    if(locationWS != null && puedoActualizar) {
+                        puedoActualizar=false;
+                        Log.e(TAG, "onLocationChanged: " + getDateTime() + " " + locationWS);
+                        ServiciosWeb sw = retrofitClient.getRetrofit().create(ServiciosWeb.class);
+                        LatLng latLng = new LatLng(locationWS.getLatitude(), locationWS.getLongitude());
+                        verificador.setUbicacion(new Ubicacion(latLng, "Ubicacion Actual del Operador"));
+                        sw.enviarUbicacionActual(verificador).enqueue(new Callback<RespEstatus>() {
+                            @Override
+                            public void onResponse(Call<RespEstatus> call, Response<RespEstatus> response) {
+                                if (response.code() == 200) {
+                                    RespEstatus resp = response.body();
+                                    Log.d(TAG," ServicioRespWS: "+resp.getEstatus());
+                                    if (resp.getEstatus().toString().equals("1"))
+                                        Log.d(TAG, "actualizacion correcta");
+                                } else
+                                    Log.d(TAG, "Web service no responde con los parametros acutuales");
+                                puedoActualizar = true;
+                            }
+
+                            @Override
+                            public void onFailure(Call<RespEstatus> call, Throwable t) {
+                                puedoActualizar=true;
+                                try {
+                                    throw t;
+                                } catch (Throwable throwable) {
+                                    throwable.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+                } catch (Exception ex) {
+                    puedoActualizar=true;
+                    Log.d(TAG, ex.getMessage());
+                }
             }
         };
     }
@@ -63,7 +101,7 @@ public class ServicioBackgroundUbicacion extends Service {
         initializeTimerTask();
 
         //schedule the timer, to wake up every 1 second
-        mTimer.schedule(timerTask, 1000, 1000); //
+        mTimer.schedule(timerTask, 1000, (1000 * 5)); //
     }
 
     public void stoptimertask() {
@@ -83,16 +121,16 @@ public class ServicioBackgroundUbicacion extends Service {
         try {
             Log.e(TAG, "onStartCommand");
             super.onStartCommand(intent, flags, startId);
-            startTimer();
-            /*verificador = new Gson().fromJson(intent.getStringExtra("paramVerificador"), Verificador.class);
+
+            verificador = new Gson().fromJson(intent.getStringExtra("paramVerificador"), Verificador.class);
             if(verificador == null)
             {
                 SharedPreferences settings =  getApplicationContext().getSharedPreferences("MisPreferencias", getApplicationContext().MODE_PRIVATE);
                 String x = settings.getString("paramVerificador","");
                 Log.d(TAG, x);
                 verificador = new Gson().fromJson(x, Verificador.class);
-            }*/
-
+            }
+            startTimer();
         } catch (Exception ex) {
             Log.d(TAG, ex.getMessage());
         }
@@ -102,10 +140,7 @@ public class ServicioBackgroundUbicacion extends Service {
     @Override
     public void onCreate() {
 
-        mTimer = new Timer();
-        mTimer.schedule(timerTask, 2000, 2 * 1000);
-
-       /* initializeLocationManager();
+        initializeLocationManager();
         try {
             mLocationManager.requestLocationUpdates(
                     LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
@@ -124,8 +159,14 @@ public class ServicioBackgroundUbicacion extends Service {
         } catch (IllegalArgumentException ex) {
             Log.d(TAG, "gps provider does not exist " + ex.getMessage());
         }
-        */
+
     }
+    private String getDateTime() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
+
 
     @Override
     public void onDestroy() {
@@ -133,9 +174,7 @@ public class ServicioBackgroundUbicacion extends Service {
         super.onDestroy();
         Log.e(TAG, "onDestroy");
         Log.e(TAG,"Evento de destruir");
-        Intent intent = new Intent("com.example.rexv666480.verificadores.ReiniciarServicio");
-        sendBroadcast(intent);
-        stoptimertask();
+
         if (mLocationManager != null) {
             for (int i = 0; i < mLocationListeners.length; i++) {
                 try {
@@ -145,6 +184,10 @@ public class ServicioBackgroundUbicacion extends Service {
                 }
             }
         }
+        Log.e(TAG,"Evento de destruir");
+        Intent intent = new Intent("com.example.rexv666480.verificadores.ReiniciarServicio");
+        sendBroadcast(intent);
+        stoptimertask();
 
     }
 
@@ -184,30 +227,7 @@ public class ServicioBackgroundUbicacion extends Service {
 
                 Log.e(TAG, "onLocationChanged: " + getDateTime() + " " + location);
                 mLastLocation.set(location);
-                ServiciosWeb sw = retrofitClient.getRetrofit().create(ServiciosWeb.class);
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                verificador.setUbicacion(new Ubicacion(latLng, "Ubicacion Actual del Operador"));
-                sw.enviarUbicacionActual(verificador).enqueue(new Callback<RespEstatus>() {
-                    @Override
-                    public void onResponse(Call<RespEstatus> call, Response<RespEstatus> response) {
-                        if (response.code() == 200) {
-                            RespEstatus resp = response.body();
-                            Log.d("ServicioRespWS:", resp.getEstatus());
-                            if (resp.getEstatus().toString().equals("1"))
-                                Log.d(TAG, "actualizacion correcta");
-                        } else
-                            Log.d(TAG, "Web service no responde con los parametros acutuales");
-                    }
-
-                    @Override
-                    public void onFailure(Call<RespEstatus> call, Throwable t) {
-                        try {
-                            throw t;
-                        } catch (Throwable throwable) {
-                            throwable.printStackTrace();
-                        }
-                    }
-                });
+                locationWS=location;
             } catch (Exception ex) {
                 Log.d(TAG, ex.getMessage());
             }
