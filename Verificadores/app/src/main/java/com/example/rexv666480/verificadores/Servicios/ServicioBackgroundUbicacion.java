@@ -50,8 +50,10 @@ public class ServicioBackgroundUbicacion extends Service {
 
 
     public void initializeTimerTask() {
+
         timerTask = new TimerTask() {
             public void run() {
+
                 Log.e(TAG, "ejecutando");
                 try {
 
@@ -60,6 +62,7 @@ public class ServicioBackgroundUbicacion extends Service {
                         Log.e(TAG, "onLocationChanged: " + getDateTime() + " " + locationWS);
                         ServiciosWeb sw = retrofitClient.getRetrofit().create(ServiciosWeb.class);
                         LatLng latLng = new LatLng(locationWS.getLatitude(), locationWS.getLongitude());
+                        ObtenerVerificador();
                         verificador.setUbicacion(new Ubicacion(latLng, "Ubicacion Actual del Operador"));
                         sw.enviarUbicacionActual(verificador).enqueue(new Callback<RespEstatus>() {
                             @Override
@@ -93,6 +96,21 @@ public class ServicioBackgroundUbicacion extends Service {
         };
     }
 
+    public void ObtenerVerificador()
+    {
+        try {
+            if(verificador == null) {
+                SharedPreferences settings = getApplicationContext().getSharedPreferences("MisPreferencias", getApplicationContext().MODE_PRIVATE);
+                String x = settings.getString("paramVerificador", "");
+                Log.d(TAG, x);
+                verificador = new Gson().fromJson(x, Verificador.class);
+            }
+        }catch (Exception ex)
+        {
+            Log.e(TAG,"error en ObtenerVerificador"+ex.getMessage());
+        }
+    }
+
     public void startTimer() {
         //set a new Timer
         mTimer = new Timer();
@@ -123,13 +141,8 @@ public class ServicioBackgroundUbicacion extends Service {
             super.onStartCommand(intent, flags, startId);
 
             verificador = new Gson().fromJson(intent.getStringExtra("paramVerificador"), Verificador.class);
-            if(verificador == null)
-            {
-                SharedPreferences settings =  getApplicationContext().getSharedPreferences("MisPreferencias", getApplicationContext().MODE_PRIVATE);
-                String x = settings.getString("paramVerificador","");
-                Log.d(TAG, x);
-                verificador = new Gson().fromJson(x, Verificador.class);
-            }
+            ObtenerVerificador();
+
             startTimer();
         } catch (Exception ex) {
             Log.d(TAG, ex.getMessage());
@@ -161,6 +174,7 @@ public class ServicioBackgroundUbicacion extends Service {
         }
 
     }
+
     private String getDateTime() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
@@ -204,7 +218,6 @@ public class ServicioBackgroundUbicacion extends Service {
         } catch (Exception ex) {
             Log.d(TAG, ex.getMessage());
         }
-
     }
 
     private class LocationListenerBack implements android.location.LocationListener {

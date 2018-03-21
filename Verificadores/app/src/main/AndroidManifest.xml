@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/logo"
@@ -14,10 +15,9 @@
         android:roundIcon="@mipmap/logo_cir"
         android:screenOrientation="portrait"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"
-            android:theme="@style/FullScreen"
-           ></activity>
-
+        <activity
+            android:name=".MainActivity"
+            android:theme="@style/FullScreen" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -29,15 +29,12 @@
         <activity
             android:name=".VisitasActivity"
             android:label="Visitas Actuales"
-
-            android:screenOrientation="portrait"></activity>
-
-        <activity android:name=".IniciarSesionActivity"
-                  android:label="App-GEO"
-            android:theme="@style/FullScreen"
-
-            android:screenOrientation="portrait" >
-
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".IniciarSesionActivity"
+            android:label="App-GEO"
+            android:screenOrientation="portrait"
+            android:theme="@style/FullScreen">
             <intent-filter>
                 <action
                     android:name="android.intent.action.MAIN"
@@ -48,8 +45,9 @@
         </activity>
 
         <service android:name=".Servicios.ServiceUbicacion" />
-        <service android:name=".Servicios.ServicioBackgroundUbicacion"
-            android:stopWithTask="false"/>
+        <service
+            android:name=".Servicios.ServicioBackgroundUbicacion"
+            android:stopWithTask="false" />
         <service android:name=".Servicios.ServiceFCMPush">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -66,12 +64,16 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" > </action>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
             </intent-filter>
             <intent-filter>
                 <action android:name="com.example.rexv666480.verificadores.ReiniciarServicio" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".SipActivity" android:label="Información">
+
+        </activity>
     </application>
 
 </manifest>

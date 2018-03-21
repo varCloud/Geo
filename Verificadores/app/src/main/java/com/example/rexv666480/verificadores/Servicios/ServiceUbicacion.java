@@ -35,11 +35,12 @@ import retrofit2.Response;
 public class ServiceUbicacion extends Service
 {
     private static final String TAG = "ServicioUbicacion";
-    private LocationManager mLocationManager = null;
+
     private static final int LOCATION_INTERVAL = 5000 ; // seis segundos
     private static final float LOCATION_DISTANCE = 0f; // 10 metros
     private RetrofitClient retrofitClient=null;
     private Verificador verificador;
+    private LocationManager mLocationManager = null;
     LocationListener[] mLocationListeners = new LocationListener[] {
             new LocationListener(LocationManager.GPS_PROVIDER),
             new LocationListener(LocationManager.NETWORK_PROVIDER)

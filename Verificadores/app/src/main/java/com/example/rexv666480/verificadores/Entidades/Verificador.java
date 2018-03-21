@@ -17,6 +17,9 @@ public class Verificador {
     private int idVisita;
     private String contrasena;
     private String usuario;
+    private String telefono;
+
+
 
     public Verificador() {
         this.ubicacion = new Ubicacion();
@@ -90,5 +93,13 @@ public class Verificador {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
 }

@@ -68,10 +68,17 @@ public class IniciarSesionActivity extends AppCompatActivity {
                             try {
                                     if((respSesion.getEstatus().toString().equals("200"))) {
                                         Verificador verificador = respSesion.getVerificador();
-                                        Intent intentRutas = new Intent(IniciarSesionActivity.this, VisitasActivity.class);
-                                        intentRutas.putExtra("paramVerificador", new Gson().toJson(verificador));
+                                        Intent intent = null;
+                                        //PARA LAS PRUEBAS DE SIP
+                                        if(true){
+                                            intent = new Intent(IniciarSesionActivity.this, SipActivity.class);
+                                        }
+                                        else {
+                                            intent = new Intent(IniciarSesionActivity.this, VisitasActivity.class);
+                                            intent.putExtra("paramVerificador", new Gson().toJson(verificador));
+                                        }
                                         GuardarPreferences(verificador);
-                                        startActivity(intentRutas);
+                                        startActivity(intent);
                                         finish();
                                     }
                             }catch (Exception ex)
@@ -112,7 +119,7 @@ public class IniciarSesionActivity extends AppCompatActivity {
             editor.commit();
         }catch (Exception ex)
         {
-            Log.d(TAG,ex.getMessage());
+            Toast("Error del sistema GuardarPreferences"+ex.getMessage());
         }
     }
 

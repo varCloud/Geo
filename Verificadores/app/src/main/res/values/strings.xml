@@ -4,4 +4,12 @@
     <string name="contra">Contraseña</string>
     <string name="iniciar">Iniciar Sesión</string>
 
+    <string name="id">ID:</string>
+    <string name="nombre">Nombre:</string>
+    <string name="telefono">Telefóno:</string>
+    <string name="lat">Latitud:</string>
+    <string name="lng">Longitud:</string>
+    <string name="puesto">Puesto:</string>
+    <string name="registroCompleto"> • Para terminar con el registro  por favor reinicie su dispositivo.</string>
+
 </resources>
