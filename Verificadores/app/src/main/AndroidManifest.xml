@@ -59,6 +59,7 @@
             </intent-filter>
         </service>
 
+        <!--
         <receiver
             android:name=".UbicacionReceiver"
             android:enabled="true"
@@ -70,7 +71,7 @@
                 <action android:name="com.example.rexv666480.verificadores.ReiniciarServicio" />
             </intent-filter>
         </receiver>
-
+      -->
         <activity android:name=".SipActivity" android:label="Información">
 
         </activity>

@@ -69,14 +69,8 @@ public class IniciarSesionActivity extends AppCompatActivity {
                                     if((respSesion.getEstatus().toString().equals("200"))) {
                                         Verificador verificador = respSesion.getVerificador();
                                         Intent intent = null;
-                                        //PARA LAS PRUEBAS DE SIP
-                                        if(true){
-                                            intent = new Intent(IniciarSesionActivity.this, SipActivity.class);
-                                        }
-                                        else {
-                                            intent = new Intent(IniciarSesionActivity.this, VisitasActivity.class);
-                                            intent.putExtra("paramVerificador", new Gson().toJson(verificador));
-                                        }
+                                        intent = new Intent(IniciarSesionActivity.this, VisitasActivity.class);
+                                        intent.putExtra("paramVerificador", new Gson().toJson(verificador));
                                         GuardarPreferences(verificador);
                                         startActivity(intent);
                                         finish();

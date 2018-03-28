@@ -119,7 +119,7 @@ public class ServicioBackgroundUbicacion extends Service {
         initializeTimerTask();
 
         //schedule the timer, to wake up every 1 second
-        mTimer.schedule(timerTask, 1000, (1000 * 5)); //
+        mTimer.schedule(timerTask, 1000, (1000 * 15)); //
     }
 
     public void stoptimertask() {
