@@ -36,10 +36,8 @@ public class AgenteServicioUbicacion {
     public void IniciarServicio(Verificador verificador)
     {
         try {
-
-                //DetenerServicio();
                 Intent intentServicio = new Intent(activity, ServiceUbicacion.class);
-                //intentServicio.putExtra("paramVerificador", new Gson().toJson(verificador));
+                intentServicio.putExtra("paramVerificador", new Gson().toJson(verificador));
                 activity.startService(intentServicio);
 
         }catch (Exception ex)

@@ -160,8 +160,6 @@ public class ServiceUbicacion extends Service
                     @Override
                     public void onResponse(Call<RespEstatus> call, Response<RespEstatus> response) {
                         if (response.code() == 200) {
-                            //response.raw().request().
-                            //Log.d("reques:",  call.request().body().);
                             RespEstatus resp = response.body();
                             Log.d("ServicioRespWS:", resp.getEstatus());
                             if (resp.getEstatus().toString().equals("1"))
